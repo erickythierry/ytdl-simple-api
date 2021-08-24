@@ -6,9 +6,9 @@ const app = express();
 
 const getRandom = (ext) => {return `${Math.floor(Math.random() * 10000)}${ext}`}
 const urlBase = process.env.URL_APP ? `https://${process.env.URL_APP}.herokuapp.com` : "http://localhost:3000"
-
-app.listen(3000, function(){
-    console.log("Listening on port 3000")
+const port = port = process.env.PORT || 3000
+app.listen(port, function(){
+    console.log("Listening on port ", port)
 });
 
 
