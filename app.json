@@ -1,0 +1,19 @@
+{
+    "name": "ytdl api simples",
+    "description": "api simples de download de musicas",
+    "logo": "",
+    "keywords": ["ytdl", "api", "download", "yt"],
+    "env": {
+        "URL_APP": {
+            "description": "escreva aqui o nome do app heroku",
+            "required": true
+        }
+    },
+    "buildpacks": [
+        {
+            "url": "https://github.com/jonathanong/heroku-buildpack-ffmpeg-latest.git"
+      },
+        {
+            "url": "https://github.com/heroku/heroku-buildpack-nodejs.git"
+        }]
+  }
