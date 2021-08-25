@@ -9,6 +9,7 @@ const getRandom = (ext) => {return `${Math.floor(Math.random() * 10000)}${ext}`}
 const myhost = (req) => { return `http://${req.headers.host}`}
 const porta = process.env.PORT || 3000
 
+app.set('json spaces', 4)
 app.use(express.static(__dirname + "/"))
 app.use('/arquivos', serveIndex(__dirname + '/publico'));
 
@@ -33,7 +34,7 @@ app.get('/', function(req, res){
     <hr>
     <br>
     <h5><b>Dev by Éricky Thierry</b></h5>
-    
+    <a href="${myhost(req)}/arquivos/">arquivos</a>
     </center>
     `)
 })
@@ -43,28 +44,56 @@ app.get('/audio', function(req, res){
     console.log('audio ', urlvideo)
     if (urlvideo!=undefined && urlvideo.length > 3){
         try {
-            const video1 = ytdl(urlvideo, {requestOptions: {headers: {cookie: COOKIE}}, quality: 'highestaudio'})
+            const video1 = ytdl(urlvideo, {requestOptions: {headers: {cookie: COOKIE}}})
             
-            var nomearquivo = getRandom('')
+            video1.on('info', info=>{
+                var nomearquivo = info.videoDetails.videoId
+                
+                if (fs.existsSync(`${__dirname}/publico/${nomearquivo}.mp4`)){
+                    console.log('mp4 ja existe')
+                    if (fs.existsSync(`${__dirname}/publico/${nomearquivo}.mp3`)){
+                        console.log('mp3 ja existe')
+                        res.json({'sucess': true, 'file': `${myhost(req)}/publico/?arquivo=${nomearquivo}.mp3`});
+                    }else{
+                        ffmpeg(`${__dirname}/publico/${nomearquivo}.mp4`)
+                        .withAudioCodec("libmp3lame")
+                        .toFormat("mp3")
+                        .saveToFile(`${__dirname}/publico/${nomearquivo}.mp3`)
+                        .on('end', () => {
+                            res.json({'sucess': true, 'file': `${myhost(req)}/publico/?arquivo=${nomearquivo}.mp3`});
+                            })
+                        .on('error', function(err){
+                            res.json({'sucess': false, "error": err.message});           
+                        })
+                    }
+
+                }else{
+                    console.log('mp4 não existe')
+                    video1.pipe(fs.createWriteStream(`${__dirname}/publico/${nomearquivo}.mp4`));
+
+                    video1.on('end', ()=>{
+                        
+                        ffmpeg(`${__dirname}/publico/${nomearquivo}.mp4`)
+                        .withAudioCodec("libmp3lame")
+                        .toFormat("mp3")
+                        .saveToFile(`${__dirname}/publico/${nomearquivo}.mp3`)
+                        .on('end', () => {
+                            res.json({'sucess': true, 'file': `${myhost(req)}/publico/?arquivo=${nomearquivo}.mp3`});
+                            })
+                        .on('error', function(err){
+                            res.json({'sucess': false, "error": err.message});           
+                        }) 
+                    })
+                }
+            })
             
             video1.on('error', err => {
                 console.log('erro em: ', err);
                 res.json({'sucess': false, "error": err.message});
-            });
-            
-            ffmpeg(video1)
-            .withAudioCodec("libmp3lame")
-            .toFormat("mp3")
-            .saveToFile(`${__dirname}/publico/${nomearquivo}.mp3`)
-            .on('end', () => {
-                res.json({'sucess': true, 'file': `${myhost(req)}/publico/?arquivo=${nomearquivo}.mp3`});
-                })
-            .on('error', function(err){
-                res.json({'sucess': false, "error": err.message});           
-            });
-            
+            })
+        } 
         
-        } catch (e) {
+        catch (e) {
             console.log('erro ', e)
             res.json({'sucess': false, "error": e.message});
         }
@@ -81,22 +110,30 @@ app.get('/video', function(req, res){
     console.log('video ', urlvideo)
     if (urlvideo!=undefined && urlvideo.length > 3){
         try {
-            var nomearquivo = getRandom('')
             const video2 = ytdl(urlvideo, {requestOptions: {headers: {cookie: COOKIE}}})
             
-            
+            video2.on('info', info=>{
+                var nomearquivo = info.videoDetails.videoId
+                
+                if (fs.existsSync(`${__dirname}/publico/${nomearquivo}.mp4`)){
+                    console.log('mp4 ja existe')
+                    res.json({'sucess': true, "file": `${myhost(req)}/publico/?arquivo=${nomearquivo}.mp4`});
+
+                }else{
+                    console.log('mp4 não existe')
+                    video2.pipe(fs.createWriteStream(`${__dirname}/publico/${nomearquivo}.mp4`));
+
+                    video2.on('end', ()=>{
+                        res.json({'sucess': true, "file": `${myhost(req)}/publico/?arquivo=${nomearquivo}.mp4`});
+                    })
+                }
+            })
             
             video2.on('error', err => {
                 console.log('erro em: ', err);
                 res.json({'sucess': false, "error": err.message});
             });
             
-            
-            video2.on('end', () => {
-                res.json({'sucess': true, "file": `${myhost(req)}/publico/?arquivo=${nomearquivo}.mp4`});
-              });
-            
-            video2.pipe(fs.createWriteStream(`${__dirname}/publico/${nomearquivo}.mp4`))
         
         } catch (e) {
             console.log('erro ', e)
@@ -128,7 +165,8 @@ app.get('/info', function(req, res){
                 
                 res.json({
                     'sucess': true,
-                    "title":info.videoDetails.title,
+                    "title" : info.videoDetails.title,
+                    "videoid" : info.videoDetails.videoId,
                     "thumb": info.player_response.microformat.playerMicroformatRenderer.thumbnail.thumbnails[0].url,
                     'duration':info.videoDetails.lengthSeconds,
                     'likes' : info.videoDetails.likes,
