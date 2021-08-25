@@ -18,16 +18,16 @@ app.get('/', function(req, res){
 
     if (urlvideo!=undefined && urlvideo.length > 3){
         try {
-            video = ytdl(urlvideo, {requestOptions: {headers: {cookie: COOKIE}}, quality: 'highestaudio'})
+            const video1 = ytdl(urlvideo, {requestOptions: {headers: {cookie: COOKIE}}, quality: 'highestaudio'})
             
             var nomearquivo = getRandom('')
             
-            video.on('error', err => {
+            video1.on('error', err => {
                 console.log('erro em: ', err);
                 res.json({'sucess': false, "error": err.message});
             });
             
-            ffmpeg(video)
+            ffmpeg(video1)
             .withAudioCodec("libmp3lame")
             .toFormat("mp3")
             .saveToFile(`${__dirname}/publico/${nomearquivo}.mp3`)
@@ -64,21 +64,20 @@ app.get('/info', function(req, res){
     
     if (link != undefined && link.length > 2){
         try {
-            video = ytdl.getInfo(link, {requestOptions: {headers: {cookie: COOKIE}}})
+            ytdl.getInfo(link, {requestOptions: {headers: {cookie: COOKIE}}}).then(info =>{
+                
+                res.json({
+                    'sucess': true,
+                    "title":info.videoDetails.title,
+                    "thumb": info.player_response.microformat.playerMicroformatRenderer.thumbnail.thumbnails[0].url,
+                    'duration':info.videoDetails.lengthSeconds,
+                    'likes' : info.videoDetails.likes,
+                    'deslikes' : info.videoDetails.dislikes
+                })
             
-            
-            video.on('error', err => {
-                console.log('erro em: ', err);
-                res.json({'sucess': false, "error": err.message});
-            });
-            
-            res.json({
-                'sucess': true,
-                "title":info.videoDetails.title,
-                "thumb": info.player_response.microformat.playerMicroformatRenderer.thumbnail.thumbnails[0].url,
-                'duration':info.videoDetails.lengthSeconds,
-                'likes' : info.videoDetails.likes,
-                'deslikes' : info.videoDetails.dislikes
+            }).catch(error =>{
+                console.log('erro em: ', error);
+                res.json({'sucess': false, "error": error.message});
             })
             
         
