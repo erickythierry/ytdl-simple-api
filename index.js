@@ -87,6 +87,6 @@ app.get('/info', function(req, res){
             res.json({'sucess': false, "error": e.message});
         }
     }else{
-        res.send('nome de arquivo não encontrado...')
+        res.json({'sucess': false, "error": 'sem url'});
     }
 })
