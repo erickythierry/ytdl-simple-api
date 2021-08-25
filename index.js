@@ -18,7 +18,7 @@ app.get('/', function(req, res){
 
     if (urlvideo!=undefined && urlvideo.length > 3){
         try {
-            const video = ytdl(urlvideo, {requestOptions: {headers: {cookie: COOKIE}}, quality: 'highestaudio'})
+            video = ytdl(urlvideo, {requestOptions: {headers: {cookie: COOKIE}}, quality: 'highestaudio'})
             
             var nomearquivo = getRandom('')
             
@@ -64,7 +64,7 @@ app.get('/info', function(req, res){
     
     if (link != undefined && link.length > 2){
         try {
-            const video = ytdl.getInfo(link, {requestOptions: {headers: {cookie: COOKIE}}})
+            video = ytdl.getInfo(link, {requestOptions: {headers: {cookie: COOKIE}}})
             
             
             video.on('error', err => {
