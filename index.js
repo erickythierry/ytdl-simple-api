@@ -9,13 +9,31 @@ const urlBase = process.env.URL_APP ? `https://${process.env.URL_APP}.herokuapp.
 const porta = process.env.PORT || 3000
 app.listen(porta, function(){
     console.log("Listening on port ", porta)
+    console.log(urlBase)
 });
 
-
 app.get('/', function(req, res){
+    res.send(`
+    <center>
+    <br>
+    <h2>como Usar...</h2>
+    <hr>    
+    <p><b>musica</b> = ${urlBase}/<b>audio?url=</b>link-do-video</p><br>
+    <p><b>video</b> = ${urlBase}/<b>video?url=</b>link-do-video</p><br>
+    <p><b>informações</b> = ${urlBase}/<b>info?url=</b>link-do-video</p><br>
+    <br>
+    <h3><b>* os retornos da API são em json</b></h3>
+    <hr>
+    <br>
+    <h5><b>Dev by Éricky Thierry</b></h5>
+    
+    </center>
+    `)
+})
+app.get('/audio', function(req, res){
     
     urlvideo = req.query.url
-
+    console.log('audio ', urlvideo)
     if (urlvideo!=undefined && urlvideo.length > 3){
         try {
             const video1 = ytdl(urlvideo, {requestOptions: {headers: {cookie: COOKIE}}, quality: 'highestaudio'})
@@ -53,7 +71,7 @@ app.get('/', function(req, res){
 app.get('/video', function(req, res){
     
     urlvideo = req.query.url
-
+    console.log('video ', urlvideo)
     if (urlvideo!=undefined && urlvideo.length > 3){
         try {
             var nomearquivo = getRandom('')
@@ -86,6 +104,7 @@ app.get('/video', function(req, res){
 
 app.get('/publico', function(req, res){
     nomearquivo = req.query.arquivo
+    console.log('baixando arquivo ', nomearquivo)
     if (nomearquivo != undefined && fs.existsSync(`${__dirname}/publico/${nomearquivo}`)){
         res.sendFile(`${__dirname}/publico/${nomearquivo}`)
     }else{
@@ -95,7 +114,7 @@ app.get('/publico', function(req, res){
 
 app.get('/info', function(req, res){
     link = req.query.url
-    
+    console.log('info ', link)
     if (link != undefined && link.length > 2){
         try {
             ytdl.getInfo(link, {requestOptions: {headers: {cookie: COOKIE}}}).then(info =>{
