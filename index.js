@@ -55,6 +55,38 @@ app.get('/publico', function(req, res){
     if (nomearquivo != undefined && fs.existsSync(`${__dirname}/publico/${nomearquivo}`)){
         res.sendFile(`${__dirname}/publico/${nomearquivo}`)
     }else{
+        res.json({'sucess': false, "error": 'sem url'});
+    }
+})
+
+app.get('/info', function(req, res){
+    link = req.query.url
+    
+    if (link != undefined && link.length > 2){
+        try {
+            const video = ytdl.getInfo(link, {requestOptions: {headers: {cookie: COOKIE}}})
+            
+            
+            video.on('error', err => {
+                console.log('erro em: ', err);
+                res.json({'sucess': false, "error": err.message});
+            });
+            
+            res.json({
+                'sucess': true,
+                "title":info.videoDetails.title,
+                "thumb": info.player_response.microformat.playerMicroformatRenderer.thumbnail.thumbnails[0].url,
+                'duration':info.videoDetails.lengthSeconds,
+                'likes' : info.videoDetails.likes,
+                'deslikes' : info.videoDetails.dislikes
+            })
+            
+        
+        } catch (e) {
+            console.log('erro ', e)
+            res.json({'sucess': false, "error": e.message});
+        }
+    }else{
         res.send('nome de arquivo não encontrado...')
     }
 })
