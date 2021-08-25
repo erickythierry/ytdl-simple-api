@@ -50,6 +50,40 @@ app.get('/', function(req, res){
     
 });
 
+app.get('/video', function(req, res){
+    
+    urlvideo = req.query.url
+
+    if (urlvideo!=undefined && urlvideo.length > 3){
+        try {
+            var nomearquivo = getRandom('')
+            const video2 = ytdl(urlvideo, {requestOptions: {headers: {cookie: COOKIE}}})
+            
+            
+            
+            video2.on('error', err => {
+                console.log('erro em: ', err);
+                res.json({'sucess': false, "error": err.message});
+            });
+            
+            
+            video2.on('end', () => {
+                res.json({'sucess': true, "file": `${urlBase}/publico/?arquivo=${nomearquivo}.mp4`});
+              });
+            
+            video2.pipe(fs.createWriteStream(`${__dirname}/publico/${nomearquivo}.mp4`))
+        
+        } catch (e) {
+            console.log('erro ', e)
+            res.json({'sucess': false, "error": e.message});
+        }
+        
+    }else{
+        res.json({'sucess': false, "error": 'sem url'});
+    }
+    
+});
+
 app.get('/publico', function(req, res){
     nomearquivo = req.query.arquivo
     if (nomearquivo != undefined && fs.existsSync(`${__dirname}/publico/${nomearquivo}`)){
