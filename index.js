@@ -9,6 +9,7 @@ const getRandom = (ext) => {return `${Math.floor(Math.random() * 10000)}${ext}`}
 const myhost = (req) => { return `http://${req.headers.host}`}
 const porta = process.env.PORT || 3000
 
+app.set('json spaces', 4)
 app.use(express.static(__dirname + "/"))
 app.use('/arquivos', serveIndex(__dirname + '/publico'));
 
@@ -33,7 +34,7 @@ app.get('/', function(req, res){
     <hr>
     <br>
     <h5><b>Dev by Éricky Thierry</b></h5>
-    
+    <a href="${myhost(req)}/arquivos/">arquivos</a>
     </center>
     `)
 })
@@ -43,7 +44,7 @@ app.get('/audio', function(req, res){
     console.log('audio ', urlvideo)
     if (urlvideo!=undefined && urlvideo.length > 3){
         try {
-            const video1 = ytdl(urlvideo, {requestOptions: {headers: {cookie: COOKIE}}, quality: 'highestaudio'})
+            const video1 = ytdl(urlvideo, {requestOptions: {headers: {cookie: COOKIE}}})
             
             var nomearquivo = getRandom('')
             
@@ -128,7 +129,8 @@ app.get('/info', function(req, res){
                 
                 res.json({
                     'sucess': true,
-                    "title":info.videoDetails.title,
+                    "title" : info.videoDetails.title,
+                    "videoid" : info.videoDetails.videoId,
                     "thumb": info.player_response.microformat.playerMicroformatRenderer.thumbnail.thumbnails[0].url,
                     'duration':info.videoDetails.lengthSeconds,
                     'likes' : info.videoDetails.likes,
