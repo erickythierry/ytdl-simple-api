@@ -11,7 +11,7 @@ const porta = process.env.PORT || 3000
 
 app.set('json spaces', 4)
 app.use(express.static(__dirname + "/"))
-app.use('/publico', serveIndex(__dirname + '/publico'));
+app.use('/arquivos', serveIndex(__dirname + '/publico'));
 
 app.listen(porta, function(){
     console.log("Listening on port ", porta)
@@ -34,7 +34,7 @@ app.get('/', function(req, res){
     <hr>
     <br>
     <h5><b>Dev by Éricky Thierry</b></h5>
-    <a href="${myhost(req)}/publico/">arquivos</a>
+    <a href="${myhost(req)}/arquivos/">arquivos</a>
     </center>
     `)
 })
