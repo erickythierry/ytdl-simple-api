@@ -8,9 +8,8 @@
     "fluent-ffmpeg": "^2.1.2",
     "nodemon": "^2.0.12",
     "serve-index": "^1.9.1",
-    "ytdl-core": "^4.9.1"
+    "ytdl-core": "github:fent/node-ytdl-core#pull/1022/head"
   },
-  "devDependencies": {},
   "scripts": {
     "start": "node index.js"
   },
