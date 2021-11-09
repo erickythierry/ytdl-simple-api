@@ -1,5 +1,5 @@
 # ytdl-simple-api
-- api simples de download de musicas do youtube
+- api simples de download de musicas e vídeos do youtube
 
 ## Deploy Fácil
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/erickythierry/ytdl-simple-api)
