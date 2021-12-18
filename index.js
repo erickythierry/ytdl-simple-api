@@ -11,7 +11,7 @@ const porta = process.env.PORT || 3000
 
 app.set('json spaces', 4)
 app.use(express.static(__dirname + "/"))
-app.use('/arquivos', serveIndex(__dirname + '/publico'));
+app.use('/publico', serveIndex(__dirname + '/publico'));
 
 app.listen(porta, function(){
     console.log("Listening on port ", porta)
@@ -34,7 +34,7 @@ app.get('/', function(req, res){
     <hr>
     <br>
     <h5><b>Dev by Éricky Thierry</b></h5>
-    <a href="${myhost(req)}/arquivos/">arquivos</a>
+    <a href="${myhost(req)}/publico/">arquivos</a>
     </center>
     `)
 })
@@ -58,7 +58,7 @@ app.get('/audio', function(req, res){
             .toFormat("mp3")
             .saveToFile(`${__dirname}/publico/${nomearquivo}.mp3`)
             .on('end', () => {
-                res.json({'sucess': true, 'file': `${myhost(req)}/publico/?arquivo=${nomearquivo}.mp3`});
+                res.json({'sucess': true, 'file': `${myhost(req)}/arquivo/?arquivo=${nomearquivo}.mp3`});
                 })
             .on('error', function(err){
                 res.json({'sucess': false, "error": err.message});           
@@ -94,7 +94,7 @@ app.get('/video', function(req, res){
             
             
             video2.on('end', () => {
-                res.json({'sucess': true, "file": `${myhost(req)}/publico/?arquivo=${nomearquivo}.mp4`});
+                res.json({'sucess': true, "file": `${myhost(req)}/arquivo/?arquivo=${nomearquivo}.mp4`});
               });
             
             video2.pipe(fs.createWriteStream(`${__dirname}/publico/${nomearquivo}.mp4`))
@@ -110,7 +110,7 @@ app.get('/video', function(req, res){
     
 });
 
-app.get('/publico', function(req, res){
+app.get('/arquivo', function(req, res){
     nomearquivo = req.query.arquivo
     console.log('baixando arquivo ', nomearquivo)
     if (nomearquivo != undefined && fs.existsSync(`${__dirname}/publico/${nomearquivo}`)){
