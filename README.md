@@ -9,5 +9,5 @@
 
 ### modo de usar:
 
-- http://sua-Url/audio?url= + link do video do youtube
+- http://URL-DO-APP/audio?url= + link do video do youtube
 - a api retornará um json com o link de download do mp3
