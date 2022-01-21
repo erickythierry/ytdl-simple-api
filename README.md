@@ -9,5 +9,5 @@
 
 ### modo de usar:
 
-- http://erickyytdl.herokuapp.com/audio?url= + link do video do youtube
+- http://sua-Url/audio?url= + link do video do youtube
 - a api retornará um json com o link de download do mp3
