@@ -38,7 +38,7 @@ app.get('/', function(req, res){
     </center>
     `)
 })
-app.get('/audio', function(req, res){
+app.get('/audio', async function(req, res){
     
     urlvideo = req.query.url
     console.log('audio ', urlvideo)
@@ -46,7 +46,9 @@ app.get('/audio', function(req, res){
         try {
             const video1 = ytdl(urlvideo, {requestOptions: {headers: {cookie: COOKIE}}})
             
-            var nomearquivo = getRandom('')
+            //var nomearquivo = getRandom('')
+            videoinfo = await getInfo(urlvideo)
+            var nomearquivo = videoinfo.videoid ? ('audio_'+videoinfo.videoid) : ('audio_'+getRandom(''))
             
             video1.on('error', err => {
                 console.log('erro em: ', err);
@@ -76,16 +78,16 @@ app.get('/audio', function(req, res){
     
 });
 
-app.get('/video', function(req, res){
+app.get('/video', async function(req, res){
     
     urlvideo = req.query.url
     console.log('video ', urlvideo)
     if (urlvideo!=undefined && urlvideo.length > 3){
         try {
-            var nomearquivo = getRandom('')
+            //var nomearquivo = getRandom('')
+            videoinfo = await getInfo(urlvideo)
+            var nomearquivo = videoinfo.videoid ? ('video_'+videoinfo.videoid) : ('video_'+getRandom(''))
             const video2 = ytdl(urlvideo, {requestOptions: {headers: {cookie: COOKIE}}})
-            
-            
             
             video2.on('error', err => {
                 console.log('erro em: ', err);
@@ -120,34 +122,40 @@ app.get('/arquivo', function(req, res){
     }
 })
 
-app.get('/info', function(req, res){
+app.get('/info', async function(req, res){
     link = req.query.url
-    console.log('info ', link)
+    console.log('get info ', link)
     if (link != undefined && link.length > 2){
-        try {
-            ytdl.getInfo(link, {requestOptions: {headers: {cookie: COOKIE}}}).then(info =>{
-                
-                res.json({
-                    'sucess': true,
-                    "title" : info.videoDetails.title,
-                    "videoid" : info.videoDetails.videoId,
-                    "thumb": info.player_response.microformat.playerMicroformatRenderer.thumbnail.thumbnails[0].url,
-                    'duration':info.videoDetails.lengthSeconds,
-                    'likes' : info.videoDetails.likes,
-                    'deslikes' : info.videoDetails.dislikes
-                })
-            
-            }).catch(error =>{
-                console.log('erro em: ', error);
-                res.json({'sucess': false, "error": error.message});
-            })
-            
-        
-        } catch (e) {
-            console.log('erro ', e)
-            res.json({'sucess': false, "error": e.message});
-        }
+        data = await getInfo(link)
+        res.json(data)
     }else{
         res.json({'sucess': false, "error": 'sem url'});
     }
 })
+
+
+async function getInfo(url){
+    try {
+        return await ytdl.getInfo(url, {requestOptions: {headers: {cookie: COOKIE}}})
+        .then((info) =>{
+                        
+            return {
+                'sucess': true,
+                "title" : info.videoDetails.title,
+                "videoid" : info.videoDetails.videoId,
+                "thumb": info.player_response.microformat.playerMicroformatRenderer.thumbnail.thumbnails[0].url,
+                'duration':info.videoDetails.lengthSeconds,
+                'likes' : info.videoDetails.likes
+            }
+            
+
+        }).catch(error =>{
+            console.log('erro get info: \n', error.message);
+            return {'sucess': false, 'error': error.message}
+        })
+    } catch (error) {
+        console.log('erro get info: \n', error);
+        return {'sucess': false, 'error': error}
+    }
+    
+}
