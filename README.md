@@ -9,7 +9,7 @@
 
 &nbsp;
 ## Deploy Manual
- - Clone esse projeto no seu computador ou VPS, acesse a raiz do projeto e execute o comando `npm install` ou `yarn` 
+ - Clone esse projeto, acesse a pasta raiz e execute o comando `npm install` ou `yarn` 
  - Após instalar as dependências, execute `npm start`
  - O endpoint do projeto vai estar em `http://localhost:3000`
 
