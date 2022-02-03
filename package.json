@@ -8,7 +8,7 @@
     "fluent-ffmpeg": "^2.1.2",
     "nodemon": "^2.0.12",
     "serve-index": "^1.9.1",
-    "ytdl-core": "^4.9.2"
+    "ytdl-core": "^4.10.1"
   },
   "scripts": {
     "start": "node index.js"
