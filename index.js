@@ -21,22 +21,23 @@ app.get('/url', function(req, res){
     res.send(('url base do site: '+ myhost(req)))
 })
 app.get('/', function(req, res){
-    res.send(`
-    <center>
-    <br>
-    <h2>como Usar...</h2>
-    <hr>    
-    <p><b>musica</b> = ${myhost(req)}/<b>audio?url=</b>link-do-video</p><br>
-    <p><b>video</b> = ${myhost(req)}/<b>video?url=</b>link-do-video</p><br>
-    <p><b>informações</b> = ${myhost(req)}/<b>info?url=</b>link-do-video</p><br>
-    <br>
-    <h3><b>* os retornos da API são em json</b></h3>
-    <hr>
-    <br>
-    <h5><b>Dev by Éricky Thierry</b></h5>
-    <a href="${myhost(req)}/publico/">arquivos</a>
-    </center>
-    `)
+    res.sendFile((__dirname+'/static/home.html'))
+    // res.send(`
+    // <center>
+    // <br>
+    // <h2>como Usar...</h2>
+    // <hr>    
+    // <p><b>musica</b> = ${myhost(req)}/<b>audio?url=</b>link-do-video</p><br>
+    // <p><b>video</b> = ${myhost(req)}/<b>video?url=</b>link-do-video</p><br>
+    // <p><b>informações</b> = ${myhost(req)}/<b>info?url=</b>link-do-video</p><br>
+    // <br>
+    // <h3><b>* os retornos da API são em json</b></h3>
+    // <hr>
+    // <br>
+    // <h5><b>Dev by Éricky Thierry</b></h5>
+    // <a href="${myhost(req)}/publico/">arquivos</a>
+    // </center>
+    // `)
 })
 app.get('/audio', async function(req, res){
     
@@ -81,13 +82,20 @@ app.get('/audio', async function(req, res){
 app.get('/video', async function(req, res){
     
     urlvideo = req.query.url
-    console.log('video ', urlvideo)
+    bestQuality = req.query.best
+    
+    console.log('video ', urlvideo, 'best', bestQuality)
     if (urlvideo!=undefined && urlvideo.length > 3){
         try {
             //var nomearquivo = getRandom('')
             videoinfo = await getInfo(urlvideo)
             var nomearquivo = videoinfo.videoid ? ('video_'+videoinfo.videoid) : ('video_'+getRandom(''))
-            const video2 = ytdl(urlvideo, {requestOptions: {headers: {cookie: COOKIE}}})
+            
+            var videoOptions = bestQuality ? 
+            {quality: 'highest', filter:'audioandvideo', requestOptions: {headers: {cookie: COOKIE}}} :
+            {requestOptions: {headers: {cookie: COOKIE}}};
+            
+            const video2 = ytdl(urlvideo, videoOptions)
             
             video2.on('error', err => {
                 console.log('erro em: ', err);
@@ -155,7 +163,7 @@ async function getInfo(url){
         })
     } catch (error) {
         console.log('erro get info: \n', error);
-        return {'sucess': false, 'error': error}
+        return {'sucess': false, 'error': error.message}
     }
     
 }

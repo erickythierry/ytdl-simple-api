@@ -9,42 +9,52 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
       rel="stylesheet">
     <script src="main.js"></script>
+    <script src="/static/main.js"></script>
     <style>
-      .bd-placeholder-img {
-        font-size: 1.125rem;
-        text-anchor: middle;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        user-select: none;
-      }
-
-      @media (min-width: 768px) {
-        .bd-placeholder-img-lg {
-          font-size: 3.5rem;
-        }
+      #erro, #alerta, #sucesso{
+        display:none;
       }
     </style>
 
     <!-- Custom styles for this template -->
     <link href="signin.css" rel="stylesheet">
+    <link href="/static/signin.css" rel="stylesheet">
   </head>
   <body class="text-center">
     
 <main class="form-signin">
   <form id="formulario">
     
+    <div id="erro" class="alert alert-danger" role="alert">
+        Erro
+    </div>
+
+    <div id="alerta" class="alert alert-warning" role="alert">
+        alerta
+    </div>
+    
+    <div id="sucesso" class="alert alert-success" role="alert">
+        sucesso
+    </div>
+    
     <h1 class="h3 fw-normal">Youtube Downloader <span class="material-icons">smart_display</span></h1>
 
-    <div class="form-floating mt-3">
-      <input type="text" class="form-control" id="user">
-      <label for="floatingInput">URL do video</label>
+    <div class="mt-5 mb-2">
+        <input class="form-control form-control text-center" id="linkvideo" type="text" placeholder="Link do video">
+    </div>
+    <div id="botaobuscar">
+        <p type="button" class="btn btn-lg btn-danger mt-3" onclick="inicio()">buscar <span class="material-icons">search</span></p>
     </div>
     
 
-    <p type="button" class="btn btn-lg btn-success mt-3" onclick="inicio()">buscar</p>
-    <p class="mt-3"">API JSON</p>
-    <p class="mt-5 mb-3 text-muted">Ericky Thierry &copy; 2022</p>
+    
+
+    
   </form>
+    <div class="mt-5">
+        <p class="mt-3"">API JSON</p>
+        <p class="mt-5 mb-3 text-muted">Ericky Thierry &copy; 2022</p>
+    </div>
 </main>
     
     </body>
