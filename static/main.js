@@ -56,13 +56,14 @@ function download(urlType){
         }else{
             response.json().then((data) => {
                 if(!data.sucess) return showAlert(('erro: ', data.error), 'alerta');
-                
+                console.log(data.file)
                 var link = document.createElement('a');
                 link.href = data.file;
-                link.download = data.file;
+                link.download = (data.file.split('arquivo='))[1];
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
+
                 document.getElementById('divDownload').innerHTML = ''
                 document.getElementById('divDownload').innerHTML = `<div class="alert alert-success" role="alert"><span class="material-icons">done</span></div>`
 
