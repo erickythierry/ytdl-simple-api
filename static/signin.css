@@ -15,6 +15,10 @@ span{
     vertical-align:middle;
   }
 
+#erro, #alerta, #sucesso{
+    display:none;
+}
+
 
 .bd-placeholder-img {
 font-size: 1.125rem;

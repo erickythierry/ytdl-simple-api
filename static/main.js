@@ -21,6 +21,7 @@ function inicio(){
                 if(!data.sucess) return showAlert(('erro: ', data.error), 'alerta');
                 
                 document.getElementById('formulario').innerHTML = downloadScreen(data)
+                showVoltarBtn()
 
             }).catch((err) => {
 
@@ -110,7 +111,7 @@ function showAlert(msg, type='erro'){
     document.getElementById(type).innerText = msg
     document.getElementById(type).style.display = 'block'
      
-    delay(10000)
+    delay(8000)
     .then(()=>{
         document.getElementById(type).innerText = ''
         document.getElementById(type).style.display = 'none'
@@ -159,4 +160,8 @@ function sToTime(duration){
     ret += "" + mins + ":" + (secs < 10 ? "0" : "");
     ret += "" + secs;
     return ret;
+}
+
+function showVoltarBtn(){
+    document.getElementById("botaovoltar").style.visibility = "visible";
 }
