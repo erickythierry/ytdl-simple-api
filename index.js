@@ -46,6 +46,7 @@ app.get('/audio', async function(req, res){
             .toFormat("mp3")
             .saveToFile(`${__dirname}/publico/${nomearquivo}.mp3`)
             .on('end', () => {
+                console.log(myhost(req))
                 res.json({'sucess': true, 'file': `${myhost(req)}/arquivo/?arquivo=${nomearquivo}.mp3`});
                 })
             .on('error', function(err){
@@ -89,6 +90,7 @@ app.get('/video', async function(req, res){
             
             
             video2.on('end', () => {
+                console.log(myhost(req))
                 res.json({'sucess': true, "file": `${myhost(req)}/arquivo/?arquivo=${nomearquivo}.mp4`});
               });
             
