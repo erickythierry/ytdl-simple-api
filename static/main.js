@@ -128,13 +128,13 @@ function downloadScreen(data){
     return `
     <p class="h3 text-muted">${data.title}</p>
         <img class="img-fluid rounded mt-2" src="${data.thumb}">
-        <p class="mt-3">
+        <p class="mt-3 text-light text-muted">
             <strong>duração:</strong> ${sToTime(data.duration)} <strong>likes:</strong> ${data.likes}
         </p>
         
         
         <div id="divDownload" class="mt-4">
-            <p class="text-muted h5">
+            <p class="text-muted text-light h5">
                 baixar:
             </p>
             <p type="button" class="btn btn-lg btn-danger" id="botaovideo" onclick="download('video_${data.videoid}')">Video <span class="material-icons">smart_display</span></p>

@@ -17,14 +17,18 @@
                 visibility:hidden;
                 
             }
-            a{text-decoration: none}
+            a {
+                text-decoration: none
+
+            }
+            
         </style>
 
         <!-- Custom styles for this template -->
         <link href="signin.css" rel="stylesheet">
         <link href="/static/signin.css" rel="stylesheet">
     </head>
-    <body class="text-center d-flex flex-column min-vh-100">
+    <body style="background-color: #353535;" class=" text-center d-flex flex-column min-vh-100">
 
         <nav class="navbar fixed-top justify-content-between">
             
@@ -53,10 +57,10 @@
                 </div>
                 
                 <div id="formulario">
-                    <h1 class="h3 fw-normal">Youtube Downloader <span class="material-icons">smart_display</span></h1>
+                    <h1 class="h3 fw-normal text-white">Youtube Downloader <span class="material-icons">smart_display</span></h1>
 
                     <div class="mt-5 mb-2">
-                        <input class="form-control form-control text-center" id="linkvideo" type="text" placeholder="Link do video">
+                        <input class="form-control text-light bg-dark text-center" id="linkvideo" type="text" placeholder="Link do video">
                     </div>
                     <div id="botaobuscar">
                         <p type="button" class="btn btn-lg btn-danger mt-3" onclick="inicio()">buscar <span class="material-icons">search</span></p>
@@ -69,7 +73,7 @@
         </main>
         
         <footer class="mt-auto">
-            <p class="text-muted">made with ❤ by <a href="https://github.com/erickythierry">Éricky Thierry</a> <br>&copy; 2022</p>
+            <p class="text-muted">made with ❤ by <a class="text-info" href="https://github.com/erickythierry">Éricky Thierry</a> <br>&copy; 2022</p>
         </footer>
     </body>
 </html>
