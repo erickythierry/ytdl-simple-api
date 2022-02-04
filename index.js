@@ -124,7 +124,7 @@ app.get('/arquivo', function(req, res){
     nomearquivo = req.query.arquivo
     console.log('baixando arquivo ', nomearquivo)
     if (nomearquivo != undefined && fs.existsSync(`${__dirname}/publico/${nomearquivo}`)){
-        res.sendFile(`${__dirname}/publico/${nomearquivo}`)
+        res.download(`${__dirname}/publico/${nomearquivo}`)
     }else{
         res.json({'sucess': false, "error": 'sem url'});
     }
