@@ -110,7 +110,7 @@ function showAlert(msg, type='erro'){
     document.getElementById(type).innerText = msg
     document.getElementById(type).style.display = 'block'
      
-    delay(4000)
+    delay(10000)
     .then(()=>{
         document.getElementById(type).innerText = ''
         document.getElementById(type).style.display = 'none'
