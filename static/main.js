@@ -65,7 +65,10 @@ function download(urlType){
                 document.body.removeChild(link);
 
                 document.getElementById('divDownload').innerHTML = ''
-                document.getElementById('divDownload').innerHTML = `<div class="alert alert-success" role="alert"><span class="material-icons">done</span></div>`
+                document.getElementById('divDownload').innerHTML = `
+                <div class="alert alert-success" role="alert">
+                    <span class="material-icons">done</span>
+                </div>`
 
 
             }).catch((err) => {

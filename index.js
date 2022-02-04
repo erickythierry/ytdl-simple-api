@@ -6,7 +6,8 @@ const app = express();
 var serveIndex = require('serve-index');
 const COOKIE = "GPS=1; YSC=yv-MFUnVO7M; VISITOR_INFO1_LIVE=puNALCZRKCU; CONSISTENCY=AGDxDeOTjvk7RLa78P5KzwVCN6INKovK8cNX2qwj0C_fUV4fwE2l90c6qR1-3jUCdClV59rYBpwxuCH1yRO56a8F3xnPiJFWfYtxPFcqSBXUsj_KlMm2h60m3Cgy5VMImdVFFvCoM3cr3Jy8SDXYPjQ; SID=Cwjp4X0LcDWQcxQkeC0RmQFP6ado5-XJpieRVOjHFjkeLuqwx_uJute3X1MZfpRaccwD-w.; __Secure-1PSID=Cwjp4X0LcDWQcxQkeC0RmQFP6ado5-XJpieRVOjHFjkeLuqwDo8mo9y4YUelACdTLePDng.; __Secure-3PSID=Cwjp4X0LcDWQcxQkeC0RmQFP6ado5-XJpieRVOjHFjkeLuqwvOKAYoj4x-Jq1VlHKe-Vag.; HSID=A9ZAk537AbZybfSUE; SSID=AwkSMERBc6gJOyue7; APISID=YYpNLuXD5YRtRdz5/AGHdcuoNJDrbs3efo; SAPISID=gDFNeREkL-mqaI6o/AiNEJYO0VV2nFKhEY; __Secure-1PAPISID=gDFNeREkL-mqaI6o/AiNEJYO0VV2nFKhEY; __Secure-3PAPISID=gDFNeREkL-mqaI6o/AiNEJYO0VV2nFKhEY; LOGIN_INFO=AFmmF2swRQIhALV4jXNd1g4TDmOT_nyjsV91ro7zww9M-cybTTdk29l6AiB8vtLmmE0dzLotAHKuGx3lapMUeZ_G6uNu5FGcFu7dzA:QUQ3MjNmemNjT3RhaXZZSUZxWGxxb1d5Xzg5NVREZVJHeXRZMmh0NV9rOUdqdnFZNHRMa1g2ZVg1enZ1eURleHBRM3VaOWo4WFpiT294dkliYjF5Wk1wdFJtclhOXy1kTTQ1WjdvUDlPMlBfRTRuQnJfSmU3ZUJnaVh1MjBQMnBYbzFNV2ZLZXB6a2NmYUlUSVlBWml5WlVjS0ptWlBYa0tKWEE5M3NCUTI4X0xMTzRKWExGUGJiR3Z0VmpHRVQ1VTBnNXlIT0N4VlZvbVdFYmQ3X3lHU3hBa01scHRYU0RYUQ==; PREF=f4=4000000&tz=America.Sao_Paulo&f6=40000000; SIDCC=AJi4QfEXEFSKytJk84Q8a4xkNWZk_yFiLXFjRiommRpKX6KWoc9btmZwGObuOvkVvGQo-L-v; __Secure-3PSIDCC=AJi4QfEWblOTHlsFNYrZkymLLVMf5SW0AAtVqHtGBz-VrYkbf895za6riX6NP7UOiBAIKMet"
 const getRandom = (ext) => {return `${Math.floor(Math.random() * 10000)}${ext}`}
-const myhost = (req) => { return `http://${req.headers.host}`}
+
+const myhost = (req) => { return `${req.protocol}://${req.headers.host}`}
 const porta = process.env.PORT || 3000
 
 app.set('json spaces', 4)
@@ -22,22 +23,6 @@ app.get('/url', function(req, res){
 })
 app.get('/', function(req, res){
     res.sendFile((__dirname+'/static/home.html'))
-    // res.send(`
-    // <center>
-    // <br>
-    // <h2>como Usar...</h2>
-    // <hr>    
-    // <p><b>musica</b> = ${myhost(req)}/<b>audio?url=</b>link-do-video</p><br>
-    // <p><b>video</b> = ${myhost(req)}/<b>video?url=</b>link-do-video</p><br>
-    // <p><b>informações</b> = ${myhost(req)}/<b>info?url=</b>link-do-video</p><br>
-    // <br>
-    // <h3><b>* os retornos da API são em json</b></h3>
-    // <hr>
-    // <br>
-    // <h5><b>Dev by Éricky Thierry</b></h5>
-    // <a href="${myhost(req)}/publico/">arquivos</a>
-    // </center>
-    // `)
 })
 app.get('/audio', async function(req, res){
     
