@@ -4,6 +4,7 @@
   "description": "api mega simples para download de musicas do youtube",
   "main": "index.js",
   "dependencies": {
+    "axios": "^0.25.0",
     "express": "^4.17.1",
     "fluent-ffmpeg": "^2.1.2",
     "nodemon": "^2.0.12",
