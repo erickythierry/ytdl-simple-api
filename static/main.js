@@ -18,7 +18,12 @@ function inicio(){
             console.log(response)
         }else{
             response.json().then((data) => {
-                if(!data.sucess) return showAlert(('erro: ', data.error), 'alerta');
+                if(!data.sucess){
+                    if(data.error.includes('410')){
+                        return showAlert(('Erro: desculpe, este video possui restriçãoes de visualização, não consigo baixar :('), 'alerta');
+                    }
+                    return showAlert(('erro: '+ data.error), 'alerta');
+                } 
                 
                 document.getElementById('formulario').innerHTML = downloadScreen(data)
                 showVoltarBtn()
