@@ -39,42 +39,43 @@ app.get('/audio', async function(req, res){
     
     urlvideo = req.query.url
     console.log('audio ', urlvideo)
-    if (urlvideo!=undefined && urlvideo.length > 3){
-        try {
-            const video1 = ytdl(urlvideo, {requestOptions: {headers: {cookie: COOKIE}}})
-            
-            //var nomearquivo = getRandom('')
-            videoinfo = await getInfo(urlvideo)
-            var nomearquivo = videoinfo.videoid ? ('audio_'+videoinfo.videoid) : ('audio_'+getRandom(''))
-            
-            video1.on('error', err => {
-                console.log('erro em: ', err);
-                res.json({'sucess': false, "error": err.message});
-            });
-            
-            ffmpeg(video1)
-            .withAudioCodec("libmp3lame")
-            .toFormat("mp3")
-            .saveToFile(`${__dirname}/publico/${nomearquivo}.mp3`)
-            .on('end', () => {
-                myhost(req)
-                .then(url =>{
-                    res.json({'sucess': true, 'file': `${url}/arquivo/?arquivo=${nomearquivo}.mp3`});
-                }) 
-            })
-            .on('error', function(err){
-                res.json({'sucess': false, "error": err.message});           
-            });
-            
+    
+    // checa se a url está vazia ou se é curta demais
+    if (!urlvideo || urlvideo.length < 11) return res.json({'sucess': false, "error": 'sem url ou URL inválida'});
+    
+    try {
+        const video1 = ytdl(urlvideo, {requestOptions: {headers: {cookie: COOKIE}}})
         
-        } catch (e) {
-            console.log('erro ', e)
-            res.json({'sucess': false, "error": e.message});
-        }
         
-    }else{
-        res.json({'sucess': false, "error": 'sem url'});
+        videoinfo = await getInfo(urlvideo)
+        var nomearquivo = videoinfo.videoid ? ('audio_'+videoinfo.videoid) : ('audio_'+getRandom(''))
+        
+        video1.on('error', err => {
+            console.log('erro em: ', err);
+            return res.json({'sucess': false, "error": err.message});
+        });
+        
+        ffmpeg(video1)
+        .withAudioCodec("libmp3lame")
+        .toFormat("mp3")
+        .saveToFile(`${__dirname}/publico/${nomearquivo}.mp3`)
+        .on('end', () => {
+            myhost(req)
+            .then(url =>{
+                res.json({'sucess': true, 'file': `${url}/arquivo/?arquivo=${nomearquivo}.mp3`});
+            }) 
+        })
+        .on('error', function(err){
+            res.json({'sucess': false, "error": err.message});           
+        });
+        
+    
+    } catch (e) {
+        console.log('erro ', e)
+        res.json({'sucess': false, "error": e.message});
     }
+        
+    
     
 });
 
@@ -84,64 +85,63 @@ app.get('/video', async function(req, res){
     bestQuality = req.query.best
     
     console.log('video ', urlvideo, 'best', bestQuality)
-    if (urlvideo!=undefined && urlvideo.length > 3){
-        try {
-            //var nomearquivo = getRandom('')
-            videoinfo = await getInfo(urlvideo)
-            var nomearquivo = videoinfo.videoid ? ('video_'+videoinfo.videoid) : ('video_'+getRandom(''))
+
+    if (!urlvideo && urlvideo.length < 11) return res.json({'sucess': false, "error": 'sem url ou URL inválida'});
+    
+    try {
+        
+        videoinfo = await getInfo(urlvideo)
+        var nomearquivo = videoinfo.videoid ? ('video_'+videoinfo.videoid) : ('video_'+getRandom(''))
+        
+        var videoOptions = bestQuality ? 
+        {quality: 'highest', filter:'audioandvideo', requestOptions: {headers: {cookie: COOKIE}}} :
+        {requestOptions: {headers: {cookie: COOKIE}}};
+        
+        const video2 = ytdl(urlvideo, videoOptions)
+        
+        video2.on('error', err => {
+            console.log('erro em: ', err);
+            res.json({'sucess': false, "error": err.message});
+        });
+        
+        
+        video2.on('end', () => {
+            myhost(req)
+            .then(url =>{
+                res.json({'sucess': true, "file": `${url}/arquivo/?arquivo=${nomearquivo}.mp4`});
+            })
             
-            var videoOptions = bestQuality ? 
-            {quality: 'highest', filter:'audioandvideo', requestOptions: {headers: {cookie: COOKIE}}} :
-            {requestOptions: {headers: {cookie: COOKIE}}};
-            
-            const video2 = ytdl(urlvideo, videoOptions)
-            
-            video2.on('error', err => {
-                console.log('erro em: ', err);
-                res.json({'sucess': false, "error": err.message});
             });
-            
-            
-            video2.on('end', () => {
-                myhost(req)
-                .then(url =>{
-                    res.json({'sucess': true, "file": `${url}/arquivo/?arquivo=${nomearquivo}.mp4`});
-                })
-                
-              });
-            
-            video2.pipe(fs.createWriteStream(`${__dirname}/publico/${nomearquivo}.mp4`))
         
-        } catch (e) {
-            console.log('erro ', e)
-            res.json({'sucess': false, "error": e.message});
-        }
-        
-    }else{
-        res.json({'sucess': false, "error": 'sem url'});
-    }
+        video2.pipe(fs.createWriteStream(`${__dirname}/publico/${nomearquivo}.mp4`))
+    
+    } catch (e) {
+        console.log('erro ', e)
+        res.json({'sucess': false, "error": e.message});
+    }  
     
 });
 
 app.get('/arquivo', function(req, res){
     nomearquivo = req.query.arquivo
+    caminho = `${__dirname}/publico/${nomearquivo}`
+
     console.log('baixando arquivo ', nomearquivo)
-    if (nomearquivo != undefined && fs.existsSync(`${__dirname}/publico/${nomearquivo}`)){
-        res.download(`${__dirname}/publico/${nomearquivo}`)
-    }else{
-        res.json({'sucess': false, "error": 'sem url'});
-    }
+    
+    if (!nomearquivo || !fs.existsSync(caminho)) return res.json({'sucess': false, "error": 'sem url'});
+    
+    res.download(`${__dirname}/publico/${nomearquivo}`)
+    
 })
 
 app.get('/info', async function(req, res){
     link = req.query.url
     console.log('get info ', link)
-    if (link != undefined && link.length > 2){
-        data = await getInfo(link)
-        res.json(data)
-    }else{
-        res.json({'sucess': false, "error": 'sem url'});
-    }
+    if (!link || link.length < 11) res.json({'sucess': false, "error": 'sem url'});
+    
+    data = await getInfo(link)
+    return res.json(data)
+    
 })
 
 
