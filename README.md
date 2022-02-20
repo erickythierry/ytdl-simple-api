@@ -1,8 +1,9 @@
-# YTdl-simple-api
-- api simples de download de musicas e vídeos do YouTube feita com node.js
-&nbsp;
+<h1 align="center">YTdl-simple-api</h1>
+<h3 align="center">api simples de download de musicas e vídeos do YouTube feita com node.js</h3>
 
-![exemplo](static/example.png)
+<p align="center">
+<img src="https://github.com/erickythierry/ytdl-simple-api/raw/95c5bf07b6ad6d0e7ab5cb1cf40518f3c0b4ee66/static/example.png" width="700">
+</p>
 
 &nbsp;
 ## Deploy Fácil
@@ -18,19 +19,49 @@
 
 &nbsp;
 ## Live Exemplo
- - https://yt.ethi.cf
+<a href="https://yt.ethi.cf"><h3>yt.ethi.cf</h3></a>
 
 &nbsp;
 ## modo de usar:
 
-##### http://URL-DO-APP/audio?url= + link do video do youtube
-- a api retornará um json com o link de download do audio do vídeo em mp3
-
-##### http://yt.ethi.cf/video?url= + link do video do youtube
-- a api retornará um json com o link de download do vídeo em mp4
-
-##### http://yt.ethi.cf/info?url= + link do video do youtube
-- a api retornará um json com algumas informações do video
+##### http://URL-DO-APP/audio?url= `link do video do youtube`
+- a api retornará um json com o link de download do audio do vídeo em mp3 como no exemplo a baixo:
+```json
+{
+    "sucess": true, 
+    "file": "url direta para baixar o audio do vídeo em formato mp3"
+}
+```
+&nbsp;
+##### http://yt.ethi.cf/video?url= `link do video do youtube`
+- a api retornará um json com o link de download do vídeo em mp4 como no exemplo a baixo:
+```json
+{
+    "sucess": true, 
+    "file": "url direta para baixar o video em formato mp4"
+}
+```
+&nbsp;
+##### http://yt.ethi.cf/info?url= `link do video do youtube`
+- a api retornará um json com algumas informações do vídeo como no exemplo a baixo:
+```json
+{
+    "sucess": true,
+    "title" : "Titulo do video",
+    "videoid" : "ID do video",
+    "thumb": "URL da thumb no formato jpg",
+    "duration" : "Duração do vídeo em segundos",
+    "likes" : "numero de likes no vídeo"
+}
+```
+&nbsp;
+##### Caso ocorra algum erro nas solicitações, a API retornará um json como o exemplo a baixo:
+```json
+{
+    "sucess": false, 
+    "error": "a mensagem do erro ocorrido"
+}
+```
 
 
 &nbsp;
