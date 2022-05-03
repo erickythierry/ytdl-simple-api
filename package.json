@@ -4,12 +4,12 @@
   "description": "api mega simples para download de musicas do youtube",
   "main": "index.js",
   "dependencies": {
-    "axios": "^0.25.0",
+    "axios": "^0.27.2",
     "express": "^4.17.1",
     "fluent-ffmpeg": "^2.1.2",
     "nodemon": "^2.0.12",
     "serve-index": "^1.9.1",
-    "ytdl-core": "^4.10.1"
+    "ytdl-core": "^4.11.0"
   },
   "scripts": {
     "start": "node index.js"
