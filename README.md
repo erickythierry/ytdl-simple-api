@@ -19,12 +19,12 @@
 
 &nbsp;
 ## Live Exemplo
-<a href="https://yt-et.herokuapp.com/"><h3>https://yt-et.herokuapp.com/</h3></a>
+<a href="http://yt.ethi.cf/"><h3>http://yt.ethi.cf/</h3></a>
 
 &nbsp;
 ## modo de usar:
 
-##### https://yt-et.herokuapp.com/audio?url= `link do video do youtube`
+##### http://yt.ethi.cf/audio?url= `link do video do youtube`
 - a api retornará um json com o link de download do audio do vídeo em mp3 como no exemplo a baixo:
 ```json
 {
@@ -33,7 +33,7 @@
 }
 ```
 &nbsp;
-##### https://yt-et.herokuapp.com/video?url= `link do video do youtube`
+##### http://yt.ethi.cf/video?url= `link do video do youtube`
 - a api retornará um json com o link de download do vídeo em mp4 como no exemplo a baixo:
 ```json
 {
@@ -42,7 +42,7 @@
 }
 ```
 &nbsp;
-##### https://yt-et.herokuapp.com/info?url= `link do video do youtube`
+##### http://yt.ethi.cf/info?url= `link do video do youtube`
 - a api retornará um json com algumas informações do vídeo como no exemplo a baixo:
 ```json
 {
