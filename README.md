@@ -19,7 +19,7 @@
 
 &nbsp;
 ## Live Exemplo
-<a href="https://yt.zaxs.cf/"><h3>http://yt.zaxs.cf/</h3></a>
+<a href="https://yt.zaxs.cf/"><h3>yt.zaxs.cf</h3></a>
 
 &nbsp;
 ## modo de usar:
