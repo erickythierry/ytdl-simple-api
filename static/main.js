@@ -20,7 +20,7 @@ function inicio(){
             response.json().then((data) => {
                 if(!data.sucess){
                     if(data.error.includes('410')){
-                        return showAlert(('Erro: Desculpe, este video possui restriçãoes de visualização, não consigo baixar 😕'), 'alerta');
+                        return showAlert(('Erro: desculpe, este video possui restriçãoes de visualização, não consigo baixar :('), 'alerta');
                     }
                     return showAlert(('erro: '+ data.error), 'alerta');
                 } 
@@ -57,7 +57,7 @@ function download(urlType){
     fetch(`/${type}?url=${linkvideo}&best=true`, requestOptions)
     .then(response => {
         if(response.status != 200){
-            showAlert('erro: o servidor não respondeu como deveria 🤔', 'alerta')
+            showAlert('erro: o servidor não respondeu como deveria :(', 'alerta')
             console.log(response)
         }else{
             response.json().then((data) => {
