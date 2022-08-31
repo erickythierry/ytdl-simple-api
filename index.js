@@ -44,8 +44,8 @@ app.get('/audio', async function(req, res){
     urlvideo = req.query.url
     console.log('audio ', urlvideo)
     
-    // checa se a url está vazia ou se é curta demais
-    if (!urlvideo || urlvideo.length < 11) return res.json({'sucess': false, "error": 'sem url ou URL inválida'});
+    // checa se a url é valida
+    if (!ytdl.validateURL(urlvideo)) return res.json({'sucess': false, "error": 'sem url ou URL inválida'});
     
     try {
         const video1 = ytdl(urlvideo, {requestOptions: {headers: {cookie: COOKIE}}})
@@ -90,7 +90,7 @@ app.get('/video', async function(req, res){
     
     console.log('video ', urlvideo, 'best', bestQuality)
 
-    if (!urlvideo && urlvideo.length < 11) return res.json({'sucess': false, "error": 'sem url ou URL inválida'});
+    if (!ytdl.validateURL(urlvideo)) return res.json({'sucess': false, "error": 'sem url ou URL inválida'});
     
     try {
         
@@ -143,7 +143,7 @@ app.get('/info', async function(req, res){
     delOldFiles()
     link = req.query.url
     console.log('get info ', link)
-    if (!link || link.length < 11) res.json({'sucess': false, "error": 'sem url'});
+    if (!ytdl.validateURL(link)) return res.json({'sucess': false, "error": 'sem url ou URL inválida'});
     
     data = await getInfo(link)
     return res.json(data)
