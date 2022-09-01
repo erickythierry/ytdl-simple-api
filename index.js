@@ -167,7 +167,7 @@ async function getInfo(url){
             
 
         }).catch(error =>{
-            console.log('erro get info: \n', error.message);
+            console.log('erro get info: \n', error);
             return {'sucess': false, 'error': error.message}
         })
     } catch (error) {
