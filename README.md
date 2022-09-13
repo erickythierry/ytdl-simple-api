@@ -21,12 +21,12 @@
  - O endpoint do projeto vai estar em `http://localhost:3000`
 &nbsp;
 ## Live Exemplo
-<a href="https://yt.zaxs.cf/"><h3>yt.zaxs.cf</h3></a>
+<a href="https://yt.ericky.cf/"><h3>yt.ericky.cf</h3></a>
 
 &nbsp;
 ## modo de usar:
 
-##### https://yt.zaxs.cf/audio?url= `link do video do youtube`
+##### https://yt.ericky.cf/audio?url= `link do video do youtube`
 - a api retornará um json com o link de download do audio do vídeo em mp3 como no exemplo a baixo:
 ```json
 {
@@ -35,7 +35,7 @@
 }
 ```
 &nbsp;
-##### https://yt.zaxs.cf/video?url= `link do video do youtube`
+##### https://yt.ericky.cf/video?url= `link do video do youtube`
 - a api retornará um json com o link de download do vídeo em mp4 como no exemplo a baixo:
 ```json
 {
@@ -44,7 +44,7 @@
 }
 ```
 &nbsp;
-##### https://yt.zaxs.cf/info?url= `link do video do youtube`
+##### https://yt.ericky.cf/info?url= `link do video do youtube`
 - a api retornará um json com algumas informações do vídeo como no exemplo a baixo:
 ```json
 {
