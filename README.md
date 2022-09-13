@@ -11,12 +11,14 @@
 
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/erickythierry/ytdl-simple-api)
 
+(infelizmente o heroku encerrará o plano free em novembro de 2022 😕)
+
 &nbsp;
 ## Deploy Manual
  - Clone esse projeto, acesse a pasta raiz e execute o comando `npm install` ou `yarn` 
- - Após instalar as dependências, execute `npm start`
+ - Crie o arquivo `.env` na raiz do projeto (veja o arquivo `.example.env` para entender como criar seu arquivo com seu cookie do youtube)
+ - Após isso, execute `npm start`
  - O endpoint do projeto vai estar em `http://localhost:3000`
-
 &nbsp;
 ## Live Exemplo
 <a href="https://yt.zaxs.cf/"><h3>yt.zaxs.cf</h3></a>
