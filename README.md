@@ -4,29 +4,29 @@
 <p align="center">
 <img src="https://github.com/erickythierry/ytdl-simple-api/raw/95c5bf07b6ad6d0e7ab5cb1cf40518f3c0b4ee66/static/example.png" width="700">
 </p>
+<hr>
 
 &nbsp;
-## Deploy Fácil
-- Clique no botão a baixo e faça deploy do projeto direto no heroku automaticamente:
-
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/erickythierry/ytdl-simple-api)
-
-(infelizmente o heroku encerrará o plano free em novembro de 2022 😕)
-
-&nbsp;
-## Deploy Manual
+## Deploy Local
  - Clone esse projeto, acesse a pasta raiz e execute o comando `npm install` ou `yarn` 
  - Crie o arquivo `.env` na raiz do projeto (veja o arquivo `.example.env` para entender como criar seu arquivo com seu cookie do youtube)
  - Após isso, execute `npm start`
  - O endpoint do projeto vai estar em `http://localhost:3000`
+
+&nbsp;
+## Deploy com CapRover
+- o projeto já está adaptado para fazer buid no capRover
+- CapRover é um sistema de deploy continuo que imita o Heroku (porém você precisa ter seu proprio servidor para usar...)
+- saiba mais sobre o CapRover <a href="https://caprover.com/">Aqui</a>
+
 &nbsp;
 ## Live Exemplo
-<a href="https://yt.ericky.cf/"><h3>yt.ericky.cf</h3></a>
+<a href="https://yt.ethi.cf/"><h3>👉 yt.ethi.cf</h3></a>
 
 &nbsp;
 ## modo de usar:
 
-##### https://yt.ericky.cf/audio?url= `link do video do youtube`
+##### https://yt.ethi.cf/audio?url= `link do video do youtube`
 - a api retornará um json com o link de download do audio do vídeo em mp3 como no exemplo a baixo:
 ```json
 {
@@ -35,7 +35,7 @@
 }
 ```
 &nbsp;
-##### https://yt.ericky.cf/video?url= `link do video do youtube`
+##### https://yt.ethi.cf/video?url= `link do video do youtube`
 - a api retornará um json com o link de download do vídeo em mp4 como no exemplo a baixo:
 ```json
 {
@@ -44,7 +44,7 @@
 }
 ```
 &nbsp;
-##### https://yt.ericky.cf/info?url= `link do video do youtube`
+##### https://yt.ethi.cf/info?url= `link do video do youtube`
 - a api retornará um json com algumas informações do vídeo como no exemplo a baixo:
 ```json
 {
