@@ -20,10 +20,6 @@
 - saiba mais sobre o CapRover <a href="https://caprover.com/">Aqui</a>
 
 &nbsp;
-## Live Exemplo
-<a href="https://yt.ethi.cf/"><h3>👉 yt.ethi.cf</h3></a>
-
-&nbsp;
 ## modo de usar:
 
 ##### https://yt.ethi.cf/audio?url= `link do video do youtube`

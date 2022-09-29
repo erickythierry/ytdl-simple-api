@@ -9,7 +9,7 @@ require('dotenv').config()
 ffmpeg.setFfmpegPath(ffmpegPath)
 const app = express();
 var serveIndex = require('serve-index');
-const COOKIE = process.env.COOKIE
+const COOKIE = process.env.COOKIE || ''
 const getRandom = (ext) => { return `${Math.floor(Math.random() * 10000)}${ext}` }
 const pasta = './publico/'
 
