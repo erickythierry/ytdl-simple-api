@@ -9,7 +9,7 @@ require('dotenv').config()
 ffmpeg.setFfmpegPath(ffmpegPath)
 const app = express();
 var serveIndex = require('serve-index');
-const COOKIE = process.env.COOKIE || ''
+const headerObj = { headers: { cookie: (process.env.COOKIE || '') } }
 const getRandom = (ext) => { return `${Math.floor(Math.random() * 10000)}${ext}` }
 const pasta = './publico/'
 
@@ -51,7 +51,7 @@ app.get('/audio', async function (req, res) {
     if (!ytdl.validateURL(urlvideo)) return res.json({ 'sucess': false, "error": 'sem url ou URL inválida' });
 
     try {
-        const video1 = ytdl(urlvideo, { requestOptions: { headers: { cookie: COOKIE } } })
+        const video1 = ytdl(urlvideo, { quality: 'highestaudio', requestOptions: headerObj })
 
 
         videoinfo = await getInfo(urlvideo)
@@ -63,9 +63,8 @@ app.get('/audio', async function (req, res) {
         });
 
         ffmpeg(video1)
-            .withAudioCodec("libmp3lame")
-            .toFormat("mp3")
-            .saveToFile(`${__dirname}/publico/${nomearquivo}.mp3`)
+            .audioBitrate(128)
+            .save(`${__dirname}/publico/${nomearquivo}.mp3`)
             .on('end', () => {
                 myhost(req)
                     .then(url => {
@@ -98,10 +97,11 @@ app.get('/video', async function (req, res) {
         var nomearquivo = videoinfo.videoid ? ('video_' + videoinfo.videoid) : ('video_' + getRandom(''))
 
         var videoOptions = bestQuality ?
-            { quality: 'highest', filter: 'audioandvideo', requestOptions: { headers: { cookie: COOKIE } } } :
-            { requestOptions: { headers: { cookie: COOKIE } } };
+            { quality: 'highest', filter: 'audioandvideo', requestOptions: headerObj } :
+            { requestOptions: headerObj };
 
         const video2 = ytdl(urlvideo, videoOptions)
+
 
         video2.on('error', err => {
             console.log('erro em: ', err);
@@ -150,7 +150,7 @@ app.get('/info', async function (req, res) {
 
 async function getInfo(url) {
     try {
-        let info = await ytdl.getInfo(url, { requestOptions: { headers: { cookie: COOKIE } } })
+        let info = await ytdl.getInfo(url, { requestOptions: headerObj })
 
         return {
             'sucess': true,
