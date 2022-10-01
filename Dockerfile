@@ -1,8 +1,7 @@
-FROM node:16
-WORKDIR /app
-COPY ./package.json /app/
-RUN npm install && npm cache clean --force
+FROM node:current-alpine
 COPY ./ /app
-ENV PORT 8080
-EXPOSE 8080
+WORKDIR /app
+RUN npm install && npm cache clean --force
+ENV PORT 80
+EXPOSE 80
 CMD [ "npm", "start" ]
