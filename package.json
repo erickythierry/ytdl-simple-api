@@ -11,6 +11,7 @@
     "fluent-ffmpeg": "^2.1.2",
     "nodemon": "^2.0.12",
     "serve-index": "^1.9.1",
+    "yt-search": "^2.10.3",
     "ytdl-core": "github:GreepTheSheep/node-ytdl-core"
   },
   "scripts": {

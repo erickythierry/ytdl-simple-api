@@ -4,6 +4,7 @@ const express = require('express');
 const ffmpeg = require('fluent-ffmpeg');
 const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
 const { default: axios } = require("axios")
+const yts = require('yt-search')
 require('dotenv').config()
 
 ffmpeg.setFfmpegPath(ffmpegPath)
@@ -146,7 +147,35 @@ app.get('/info', async function (req, res) {
     data = await getInfo(link)
     return res.json(data)
 })
+app.get('/buscar', async function (req, res) {
+    delOldFiles()
+    let busca = req.query.text
+    console.log('get buscar ', busca)
+    if (!busca?.length) return res.json({ 'sucess': false, "error": 'termo ou frase de busca nao fornecido' });
 
+    data = await buscar(busca)
+    return res.json({ sucess: true, data: data })
+})
+
+async function buscar(texto) {
+    const busca = await yts(texto)
+    const videos = busca.videos.slice(0, 5)
+    let lista = []
+    videos.forEach(video => {
+        lista.push({
+            title: video.title,
+            id: video.videoId,
+            url: video.url,
+            thumb: video.thumbnail,
+            views: video.views,
+            duration: {
+                seconds: video.duration.seconds,
+                time: video.duration.timestamp
+            }
+        })
+    })
+    return lista
+}
 
 async function getInfo(url) {
     try {
@@ -185,8 +214,6 @@ async function delOldFiles() {
                 if (data > 600) {
                     console.log('apagando', file)
                     fs.unlinkSync(file)
-                } else {
-                    console.log('deixando', file)
                 }
             }
 

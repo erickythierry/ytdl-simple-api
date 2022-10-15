@@ -1,5 +1,5 @@
 <h1 align="center">YTdl-simple-api</h1>
-<h3 align="center">api simples de download de musicas e vídeos do YouTube feita com node.js</h3>
+<h3 align="center">api simples de busca e download de musicas e vídeos do YouTube feita com node.js</h3>
 
 <p align="center">
 <img src="https://github.com/erickythierry/ytdl-simple-api/raw/95c5bf07b6ad6d0e7ab5cb1cf40518f3c0b4ee66/static/example.png" width="700">
@@ -21,7 +21,32 @@
 
 &nbsp;
 ## modo de usar:
-
+&nbsp;
+##### https://yt.ethi.cf/buscar?text= `frase ou termo a ser buscado`
+- a api retornará um json com um array de 5 itens contendo os dados dos videos encontrados. Segue exemplo a baixo:
+```json
+{
+    "sucess": true, 
+    "data": [
+    {
+      "title": "Parabéns pra Você!",
+      "id": "ROlOAlCAmr8",
+      "url": "https://youtube.com/watch?v=ROlOAlCAmr8",
+      "thumb": "https://i.ytimg.com/vi/ROlOAlCAmr8/hqdefault.jpg",
+      "views": 16721041,
+      "duration": {
+        "seconds": 92,
+        "time": "1:32"
+      }
+    },
+    {...},
+    {...},
+    {...},
+    {...}
+    ]
+}
+```
+&nbsp;
 ##### https://yt.ethi.cf/audio?url= `link do video do youtube`
 - a api retornará um json com o link de download do audio do vídeo em mp3 como no exemplo a baixo:
 ```json
