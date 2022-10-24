@@ -6,6 +6,8 @@ const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
 const { default: axios } = require("axios")
 const yts = require('yt-search')
 require('dotenv').config()
+const cp = require('child_process');
+const stream = require('stream');
 
 ffmpeg.setFfmpegPath(ffmpegPath)
 const app = express();
@@ -52,19 +54,19 @@ app.get('/audio', async function (req, res) {
     if (!ytdl.validateURL(urlvideo)) return res.json({ 'sucess': false, "error": 'sem url ou URL inválida' });
 
     try {
-        const video1 = ytdl(urlvideo, { quality: 'highestaudio', requestOptions: headerObj })
+        let video = ytdl(urlvideo, { quality: 'highestaudio', requestOptions: headerObj })
 
 
-        videoinfo = await getInfo(urlvideo)
-        var nomearquivo = videoinfo.videoid ? ('audio_' + videoinfo.videoid) : ('audio_' + getRandom(''))
+        let videoinfo = await getInfo(urlvideo)
+        let nomearquivo = videoinfo.videoid ? ('audio_' + videoinfo.videoid) : ('audio_' + getRandom(''))
 
-        video1.on('error', err => {
+        video.on('error', err => {
             console.log('erro em: ', err);
             return res.json({ 'sucess': false, "error": err.message });
         });
 
-        ffmpeg(video1)
-            .audioBitrate(128)
+        ffmpeg(video)
+            .audioCodec('libmp3lame')
             .save(`${__dirname}/publico/${nomearquivo}.mp3`)
             .on('end', () => {
                 myhost(req)
@@ -82,50 +84,39 @@ app.get('/audio', async function (req, res) {
         res.json({ 'sucess': false, "error": e.message });
     }
 });
-
 app.get('/video', async function (req, res) {
     delOldFiles()
-    urlvideo = req.query.url
-    bestQuality = req.query.best
+    let urlvideo = req.query.url
+    let bestQuality = req.query.best
 
     console.log('video ', urlvideo, 'best', bestQuality)
 
     if (!ytdl.validateURL(urlvideo)) return res.json({ 'sucess': false, "error": 'sem url ou URL inválida' });
 
     try {
+        let video = await ytmixer(urlvideo)
+        if (!video) return res.json({ 'sucess': false, "error": 'erro ao processar o download' });
+        let caminho = `${__dirname}/publico/`
+        let nomearquivo = `video_${getRandom('.mp4')}`
+        let arquivo = fs.createWriteStream((caminho + nomearquivo))
+        video.pipe(arquivo)
 
-        videoinfo = await getInfo(urlvideo)
-        var nomearquivo = videoinfo.videoid ? ('video_' + videoinfo.videoid) : ('video_' + getRandom(''))
+        await new Promise((res) => {
+            arquivo.on("finish", () => {
+                res()
+            })
 
-        var videoOptions = bestQuality ?
-            { quality: 'highest', filter: 'audioandvideo', requestOptions: headerObj } :
-            { requestOptions: headerObj };
-
-        const video2 = ytdl(urlvideo, videoOptions)
-
-
-        video2.on('error', err => {
-            console.log('erro em: ', err);
-            res.json({ 'sucess': false, "error": err.message });
-        });
-
-
-        video2.on('end', () => {
-            myhost(req)
-                .then(url => {
-                    res.json({ 'sucess': true, "file": `${url}/arquivo/?arquivo=${nomearquivo}.mp4` });
-                })
-
-        });
-
-        video2.pipe(fs.createWriteStream(`${__dirname}/publico/${nomearquivo}.mp4`))
+            arquivo.on("error", () => res.json({ 'sucess': false, "error": 'convertion error' }))
+        })
+        let url = await myhost(req)
+        console.log(url)
+        return res.json({ 'sucess': true, "file": `${url}/arquivo/?arquivo=${nomearquivo}` });
 
     } catch (e) {
         console.log('erro ', e)
-        res.json({ 'sucess': false, "error": e.message });
+        return res.json({ 'sucess': false, "error": e.message });
     }
 });
-
 app.get('/arquivo', function (req, res) {
     delOldFiles()
     nomearquivo = req.query.arquivo
@@ -135,9 +126,8 @@ app.get('/arquivo', function (req, res) {
 
     if (!nomearquivo || !fs.existsSync(caminho)) return res.json({ 'sucess': false, "error": 'sem url' });
 
-    res.download(`${__dirname}/publico/${nomearquivo}`)
+    res.download(caminho)
 })
-
 app.get('/info', async function (req, res) {
     delOldFiles()
     link = req.query.url
@@ -156,7 +146,6 @@ app.get('/buscar', async function (req, res) {
     data = await buscar(busca)
     return res.json({ sucess: true, data: data })
 })
-
 async function buscar(texto) {
     const busca = await yts(texto)
     const videos = busca.videos.slice(0, 5)
@@ -176,7 +165,6 @@ async function buscar(texto) {
     })
     return lista
 }
-
 async function getInfo(url) {
     try {
         let info = await ytdl.getInfo(url, { requestOptions: headerObj })
@@ -195,7 +183,46 @@ async function getInfo(url) {
         return { 'sucess': false, 'error': error.message }
     }
 }
+async function ytmixer(link, options = {}) {
 
+    //const result = new stream.PassThrough({ highWaterMark: (options).highWaterMark || 1024 * 512 })
+    const result = new stream.PassThrough()
+    try {
+        let info = await ytdl.getInfo(link, options)
+        let audioStream = ytdl.downloadFromInfo(info, { ...options, ...headerObj, quality: 'highestaudio' })
+        let videoStream = ytdl.downloadFromInfo(info, { ...options, ...headerObj, quality: 'highestvideo' });
+        // create the ffmpeg process for muxing
+        let ffmpegProcess = cp.spawn(ffmpegPath, [
+            // supress non-crucial messages
+            '-loglevel', '8', '-hide_banner',
+            // input audio and video by pipe
+            '-i', 'pipe:3', '-i', 'pipe:4',
+            // map audio and video correspondingly
+            '-map', '0:a', '-map', '1:v',
+            // no need to change the codec
+            '-c', 'copy',
+            // output mp4 and pipe
+            '-f', 'matroska', 'pipe:5'
+        ], {
+            // no popup window for Windows users
+            windowsHide: true,
+            stdio: [
+                // silence stdin/out, forward stderr,
+                'inherit', 'inherit', 'inherit',
+                // and pipe audio, video, output
+                'pipe', 'pipe', 'pipe'
+            ]
+        });
+        audioStream.pipe(ffmpegProcess.stdio[3]);
+        videoStream.pipe(ffmpegProcess.stdio[4]);
+        ffmpegProcess.stdio[5].pipe(result);
+
+        return result;
+
+    } catch (error) {
+        console.log(error.message)
+    }
+}
 async function delOldFiles() {
 
     fs.readdir(pasta, function (err, files) {
