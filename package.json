@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "api mega simples para download de musicas do youtube",
   "main": "index.js",
+  "type": "module",
   "dependencies": {
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
     "axios": "^0.27.2",

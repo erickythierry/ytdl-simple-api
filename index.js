@@ -1,33 +1,27 @@
-const fs = require('fs');
-const ytdl = require('ytdl-core');
-const express = require('express');
-const ffmpeg = require('fluent-ffmpeg');
-const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
-const { default: axios } = require("axios")
-const yts = require('yt-search')
-require('dotenv').config()
-const cp = require('child_process');
-const stream = require('stream');
+import { createWriteStream, existsSync, readdir, statSync, unlinkSync } from 'fs';
+import express from 'express';
+import { path as ffmpegPath } from '@ffmpeg-installer/ffmpeg';
+import { default as axios } from "axios";
+import yts from 'yt-search';
+import dotenv from 'dotenv'
+import { spawn } from 'child_process';
+import { PassThrough } from 'stream';
+import serveIndex from 'serve-index';
+import ytdl from 'ytdl-core';
+import ffmpeg from 'fluent-ffmpeg';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+dotenv.config()
 ffmpeg.setFfmpegPath(ffmpegPath)
 const app = express();
-var serveIndex = require('serve-index');
 const headerObj = { headers: { cookie: (process.env.COOKIE || '') } }
-const getRandom = (ext) => { return `${Math.floor(Math.random() * 10000)}${ext}` }
+const getRandom = (ext) => { return `${Math.floor(Math.random() * 9876541)}${(ext || '')}` }
 const pasta = './publico/'
-
-
-const myhost = async (req) => {
-    // checa se o site suporta https
-    myurl = req.headers.host
-    try {
-        await axios(('https://' + myurl));
-        return ('https://' + req.headers.host);
-    } catch (error) {
-        return ('http://' + req.headers.host);
-    }
-}
 const porta = process.env.PORT || 3000
+let myurl = null
 
 app.set('json spaces', 4)
 app.use(express.static(__dirname + "/"))
@@ -37,21 +31,16 @@ app.listen(porta, function () {
     console.log("Listening on port ", porta)
     if (porta == 3000) { console.log('rodando localmente em http://localhost:3000') }
 });
-app.get('/url', async function (req, res) {
-    delOldFiles()
+app.get('/url', delOldFiles, async function (req, res) {
+
     res.send(('url base do site: ' + await myhost(req)))
 })
-app.get('/', function (req, res) {
-    delOldFiles()
+app.get('/', delOldFiles, function (req, res) {
     res.sendFile((__dirname + '/static/home.html'))
 })
-app.get('/audio', async function (req, res) {
-    delOldFiles()
-    urlvideo = req.query.url
+app.get('/audio', delOldFiles, validateUrlRouter, async function (req, res) {
+    let urlvideo = req.query.url
     console.log('audio ', urlvideo)
-
-    // checa se a url é valida
-    if (!ytdl.validateURL(urlvideo)) return res.json({ 'sucess': false, "error": 'sem url ou URL inválida' });
 
     try {
         let video = ytdl(urlvideo, { quality: 'highestaudio', requestOptions: headerObj })
@@ -84,8 +73,7 @@ app.get('/audio', async function (req, res) {
         res.json({ 'sucess': false, "error": e.message });
     }
 });
-app.get('/video', async function (req, res) {
-    delOldFiles()
+app.get('/video', delOldFiles, validateUrlRouter, async function (req, res) {
     let urlvideo = req.query.url
     let bestQuality = req.query.best
 
@@ -98,7 +86,7 @@ app.get('/video', async function (req, res) {
         if (!video) return res.json({ 'sucess': false, "error": 'erro ao processar o download' });
         let caminho = `${__dirname}/publico/`
         let nomearquivo = `video_${getRandom('.mp4')}`
-        let arquivo = fs.createWriteStream((caminho + nomearquivo))
+        let arquivo = createWriteStream((caminho + nomearquivo))
         video.pipe(arquivo)
 
         await new Promise((res) => {
@@ -117,41 +105,51 @@ app.get('/video', async function (req, res) {
         return res.json({ 'sucess': false, "error": e.message });
     }
 });
-app.get('/arquivo', function (req, res) {
-    delOldFiles()
-    nomearquivo = req.query.arquivo
-    caminho = `${__dirname}/publico/${nomearquivo}`
+app.get('/arquivo', delOldFiles, function (req, res) {
+    let nomearquivo = req.query.arquivo
+    let caminho = `${__dirname}/publico/${nomearquivo}`
 
     console.log('baixando arquivo ', nomearquivo)
 
-    if (!nomearquivo || !fs.existsSync(caminho)) return res.json({ 'sucess': false, "error": 'sem url' });
+    if (!nomearquivo || !existsSync(caminho)) return res.json({ 'sucess': false, "error": 'sem url' });
 
     res.download(caminho)
 })
-app.get('/info', async function (req, res) {
-    delOldFiles()
-    link = req.query.url
+app.get('/info', delOldFiles, async function (req, res) {
+    let link = req.query.url
     console.log('get info ', link)
     if (!ytdl.validateURL(link)) return res.json({ 'sucess': false, "error": 'sem url ou URL inválida' });
 
-    data = await getInfo(link)
+    let data = await getInfo(link)
     return res.json(data)
 })
-app.get('/buscar', async function (req, res) {
+app.get('/buscar', delOldFiles, async function (req, res) {
     delOldFiles()
     let busca = req.query.text
     console.log('get buscar ', busca)
     if (!busca?.length) return res.json({ 'sucess': false, "error": 'termo ou frase de busca nao fornecido' });
 
-    data = await buscar(busca)
+    let data = await buscar(busca)
     return res.json({ sucess: true, data: data })
 })
+
+async function myhost(req) {
+    if (myurl) return myurl;
+    // checa se o site suporta https
+    try {
+        await axios(('https://' + req.headers.host));
+        myurl = 'https://' + req.headers.host
+    } catch (error) {
+        myurl = 'http://' + req.headers.host
+    }
+    return myurl
+}
 async function buscar(texto) {
     const busca = await yts(texto)
     const videos = busca.videos.slice(0, 5)
-    let lista = []
-    videos.forEach(video => {
-        lista.push({
+
+    let lista = videos.map(video => {
+        return {
             title: video.title,
             id: video.videoId,
             url: video.url,
@@ -161,7 +159,7 @@ async function buscar(texto) {
                 seconds: video.duration.seconds,
                 time: video.duration.timestamp
             }
-        })
+        }
     })
     return lista
 }
@@ -186,13 +184,13 @@ async function getInfo(url) {
 async function ytmixer(link, options = {}) {
 
     //const result = new stream.PassThrough({ highWaterMark: (options).highWaterMark || 1024 * 512 })
-    const result = new stream.PassThrough()
+    const result = new PassThrough()
     try {
         let info = await ytdl.getInfo(link, options)
         let audioStream = ytdl.downloadFromInfo(info, { ...options, ...headerObj, quality: 'highestaudio' })
         let videoStream = ytdl.downloadFromInfo(info, { ...options, ...headerObj, quality: 'highestvideo' });
         // create the ffmpeg process for muxing
-        let ffmpegProcess = cp.spawn(ffmpegPath, [
+        let ffmpegProcess = spawn(ffmpegPath, [
             // supress non-crucial messages
             '-loglevel', '8', '-hide_banner',
             // input audio and video by pipe
@@ -223,9 +221,9 @@ async function ytmixer(link, options = {}) {
         console.log(error.message)
     }
 }
-async function delOldFiles() {
+async function delOldFiles(req, res, next) {
 
-    fs.readdir(pasta, function (err, files) {
+    readdir(pasta, function (err, files) {
         //handling error
         if (err) {
             return console.log('Unable to scan directory: ' + err);
@@ -234,16 +232,23 @@ async function delOldFiles() {
         files.forEach(function (file) {
             file = (pasta + file)
             if (file.includes('.mp3') || file.includes('.mp4')) {
-                let stats = fs.statSync(file);
+                let stats = statSync(file);
                 let modificado = new Date(stats.ctime).getTime()
                 let agora = new Date().getTime();
                 let data = (agora - modificado) / 1000
                 if (data > 600) {
                     console.log('apagando', file)
-                    fs.unlinkSync(file)
+                    unlinkSync(file)
                 }
             }
 
         });
     });
+
+    if (req) next()
+}
+function validateUrlRouter(req, res, next) {
+    let urlvideo = req.query.url
+    if (!ytdl.validateURL(urlvideo)) return res.json({ 'sucess': false, "error": 'sem url ou URL inválida' });
+    next()
 }
