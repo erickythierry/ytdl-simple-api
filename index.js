@@ -187,8 +187,20 @@ async function ytmixer(link, options = {}) {
     const result = new PassThrough()
     try {
         let info = await ytdl.getInfo(link, options)
+        let qualidades = info.formats
+            .filter(i => { // filtra apenas os formatos mp4 que sejam 720p ou 480p
+                if (i.container == 'mp4') {
+                    if (i.qualityLabel == '720p' || i.qualityLabel == '480p') return true
+                }
+            })
+            .map(i => { return { q: i.qualityLabel, itag: i.itag } }) // reduz para apenas as propriedades qualityLabel e itag
+            .sort((a, b) => { // organiza em sequencia as qualidades para que 720p fique sempre em primeiro
+                if (parseInt(a.q) > parseInt(b.q)) return -1
+                return 1
+            })
+
         let audioStream = ytdl.downloadFromInfo(info, { ...options, ...headerObj, quality: 'highestaudio' })
-        let videoStream = ytdl.downloadFromInfo(info, { ...options, ...headerObj, quality: 'highestvideo' });
+        let videoStream = ytdl.downloadFromInfo(info, { ...options, ...headerObj, quality: qualidades[0].itag });
         // create the ffmpeg process for muxing
         let ffmpegProcess = spawn(ffmpegPath, [
             // supress non-crucial messages
