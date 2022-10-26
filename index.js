@@ -181,26 +181,46 @@ async function getInfo(url) {
         return { 'sucess': false, 'error': error.message }
     }
 }
-async function ytmixer(link, options = {}) {
+async function ytmixer(link,) {
 
     //const result = new stream.PassThrough({ highWaterMark: (options).highWaterMark || 1024 * 512 })
     const result = new PassThrough()
     try {
-        let info = await ytdl.getInfo(link, options)
-        let qualidades = info.formats
+        let info = await ytdl.getInfo(link, headerObj)
+        let videoQualityList = info.formats
             .filter(i => { // filtra apenas os formatos mp4 que sejam 720p ou 480p
                 if (i.container == 'mp4') {
-                    if (i.qualityLabel == '720p' || i.qualityLabel == '480p') return true
+                    if (i.qualityLabel == '480p' || i.qualityLabel == '720p') return true //
                 }
             })
-            .map(i => { return { q: i.qualityLabel, itag: i.itag } }) // reduz para apenas as propriedades qualityLabel e itag
+            .map(i => { return { q: i.qualityLabel, itag: i.itag, audio: i.hasAudio } }) // reduz para apenas as propriedades qualityLabel e itag
             .sort((a, b) => { // organiza em sequencia as qualidades para que 720p fique sempre em primeiro
                 if (parseInt(a.q) > parseInt(b.q)) return -1
                 return 1
+            }).sort((a, b) => {
+                if (a.audio == true) return -1;
+                return 1
+            })
+        // faz o retorno apenas do video caso o mesmo já apresente audio embutido
+        if (videoQualityList[0].audio) {
+            console.log('ja possui audio no video')
+            return ytdl.downloadFromInfo(info, { ...headerObj, quality: videoQualityList[0].itag });
+        }
+
+        let audioQualityList = info.formats
+            .filter(i => {
+                if (i.audioCodec == 'mp4a.40.2') {
+                    if (i.audioBitrate >= 128) return true
+                }
+            })
+            .map(i => { return { bitrate: i.audioBitrate, itag: i.itag } })
+            .sort((a, b) => {
+                if (a.bitrate > b.bitrate) return -1
+                return 1
             })
 
-        let audioStream = ytdl.downloadFromInfo(info, { ...options, ...headerObj, quality: 'highestaudio' })
-        let videoStream = ytdl.downloadFromInfo(info, { ...options, ...headerObj, quality: qualidades[0].itag });
+        let audioStream = ytdl.downloadFromInfo(info, { ...headerObj, quality: audioQualityList[0].itag })
+        let videoStream = ytdl.downloadFromInfo(info, { ...headerObj, quality: videoQualityList[0].itag });
         // create the ffmpeg process for muxing
         let ffmpegProcess = spawn(ffmpegPath, [
             // supress non-crucial messages
