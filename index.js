@@ -2,24 +2,20 @@ import { createWriteStream, existsSync, readdir, statSync, unlinkSync } from 'fs
 import express from 'express';
 import { path as ffmpegPath } from '@ffmpeg-installer/ffmpeg';
 import { default as axios } from "axios";
-import yts from 'yt-search';
 import dotenv from 'dotenv'
-import { spawn } from 'child_process';
-import { PassThrough } from 'stream';
 import serveIndex from 'serve-index';
 import ytdl from 'ytdl-core';
 import ffmpeg from 'fluent-ffmpeg';
-import path from 'path';
-import { fileURLToPath } from 'url';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import { __filename, __dirname } from './src/dirname.js';
+import { validateUrlRouter, delOldFiles } from './src/middlewares.js'
+import {} from "./src/youtube.js"
+
 dotenv.config()
 ffmpeg.setFfmpegPath(ffmpegPath)
 const app = express();
 const headerObj = { headers: { cookie: (process.env.COOKIE || '') } }
 const getRandom = (ext) => { return `${Math.floor(Math.random() * 9876541)}${(ext || '')}` }
-const pasta = './publico/'
 const porta = process.env.PORT || 3000
 let myurl = null
 
@@ -32,7 +28,6 @@ app.listen(porta, function () {
     if (porta == 3000) { console.log('rodando localmente em http://localhost:3000') }
 });
 app.get('/url', delOldFiles, async function (req, res) {
-
     res.send(('url base do site: ' + await myhost(req)))
 })
 app.get('/', delOldFiles, function (req, res) {
@@ -144,143 +139,5 @@ async function myhost(req) {
     }
     return myurl
 }
-async function buscar(texto) {
-    const busca = await yts(texto)
-    const videos = busca.videos.slice(0, 5)
 
-    let lista = videos.map(video => {
-        return {
-            title: video.title,
-            id: video.videoId,
-            url: video.url,
-            thumb: video.thumbnail,
-            views: video.views,
-            duration: {
-                seconds: video.duration.seconds,
-                time: video.duration.timestamp
-            }
-        }
-    })
-    return lista
-}
-async function getInfo(url) {
-    try {
-        let info = await ytdl.getInfo(url, { requestOptions: headerObj })
 
-        return {
-            'sucess': true,
-            "title": info.videoDetails.title,
-            "videoid": info.videoDetails.videoId,
-            "thumb": info.player_response.microformat.playerMicroformatRenderer.thumbnail.thumbnails[0].url,
-            'duration': info.videoDetails.lengthSeconds,
-            'likes': info.videoDetails.likes
-        }
-
-    } catch (error) {
-        console.log('erro get info: \n', error);
-        return { 'sucess': false, 'error': error.message }
-    }
-}
-async function ytmixer(link,) {
-
-    //const result = new stream.PassThrough({ highWaterMark: (options).highWaterMark || 1024 * 512 })
-    const result = new PassThrough()
-    try {
-        let info = await ytdl.getInfo(link, headerObj)
-        let videoQualityList = info.formats
-            .filter(i => { // filtra apenas os formatos mp4 que sejam 720p ou 480p
-                if (i.container == 'mp4') {
-                    if (i.qualityLabel == '480p' || i.qualityLabel == '720p') return true //
-                }
-            })
-            .map(i => { return { q: i.qualityLabel, itag: i.itag, audio: i.hasAudio } }) // reduz para apenas as propriedades qualityLabel e itag
-            .sort((a, b) => { // organiza em sequencia as qualidades para que 720p fique sempre em primeiro
-                if (parseInt(a.q) > parseInt(b.q)) return -1
-                return 1
-            }).sort((a, b) => {
-                if (a.audio == true) return -1;
-                return 1
-            })
-        // faz o retorno apenas do video caso o mesmo já apresente audio embutido
-        if (videoQualityList[0].audio) {
-            console.log('ja possui audio no video')
-            return ytdl.downloadFromInfo(info, { ...headerObj, quality: videoQualityList[0].itag });
-        }
-
-        let audioQualityList = info.formats
-            .filter(i => {
-                if (i.audioCodec == 'mp4a.40.2') {
-                    if (i.audioBitrate >= 128) return true
-                }
-            })
-            .map(i => { return { bitrate: i.audioBitrate, itag: i.itag } })
-            .sort((a, b) => {
-                if (a.bitrate > b.bitrate) return -1
-                return 1
-            })
-
-        let audioStream = ytdl.downloadFromInfo(info, { ...headerObj, quality: audioQualityList[0].itag })
-        let videoStream = ytdl.downloadFromInfo(info, { ...headerObj, quality: videoQualityList[0].itag });
-        // create the ffmpeg process for muxing
-        let ffmpegProcess = spawn(ffmpegPath, [
-            // supress non-crucial messages
-            '-loglevel', '8', '-hide_banner',
-            // input audio and video by pipe
-            '-i', 'pipe:3', '-i', 'pipe:4',
-            // map audio and video correspondingly
-            '-map', '0:a', '-map', '1:v',
-            // no need to change the codec
-            '-c', 'copy',
-            // output mp4 and pipe
-            '-f', 'matroska', 'pipe:5'
-        ], {
-            // no popup window for Windows users
-            windowsHide: true,
-            stdio: [
-                // silence stdin/out, forward stderr,
-                'inherit', 'inherit', 'inherit',
-                // and pipe audio, video, output
-                'pipe', 'pipe', 'pipe'
-            ]
-        });
-        audioStream.pipe(ffmpegProcess.stdio[3]);
-        videoStream.pipe(ffmpegProcess.stdio[4]);
-        ffmpegProcess.stdio[5].pipe(result);
-
-        return result;
-
-    } catch (error) {
-        console.log(error.message)
-    }
-}
-async function delOldFiles(req, res, next) {
-
-    readdir(pasta, function (err, files) {
-        //handling error
-        if (err) {
-            return console.log('Unable to scan directory: ' + err);
-        }
-        //listing all files using forEach
-        files.forEach(function (file) {
-            file = (pasta + file)
-            if (file.includes('.mp3') || file.includes('.mp4')) {
-                let stats = statSync(file);
-                let modificado = new Date(stats.ctime).getTime()
-                let agora = new Date().getTime();
-                let data = (agora - modificado) / 1000
-                if (data > 600) {
-                    console.log('apagando', file)
-                    unlinkSync(file)
-                }
-            }
-
-        });
-    });
-
-    if (req) next()
-}
-function validateUrlRouter(req, res, next) {
-    let urlvideo = req.query.url
-    if (!ytdl.validateURL(urlvideo)) return res.json({ 'sucess': false, "error": 'sem url ou URL inválida' });
-    next()
-}
