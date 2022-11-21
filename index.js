@@ -1,27 +1,20 @@
-import { createWriteStream, existsSync, readdir, statSync, unlinkSync } from 'fs';
+import { existsSync } from 'fs';
 import express from 'express';
-import { path as ffmpegPath } from '@ffmpeg-installer/ffmpeg';
-import { default as axios } from "axios";
 import dotenv from 'dotenv'
 import serveIndex from 'serve-index';
-import ytdl from 'ytdl-core';
-import ffmpeg from 'fluent-ffmpeg';
 
-import { __filename, __dirname } from './src/dirname.js';
+import { __filename, __dirname } from './dirname.js';
 import { validateUrlRouter, delOldFiles } from './src/middlewares.js'
-import {} from "./src/youtube.js"
+import ytapi from "./src/youtube/index.js"
+import { myhost } from "./src/core.js"
 
 dotenv.config()
-ffmpeg.setFfmpegPath(ffmpegPath)
 const app = express();
-const headerObj = { headers: { cookie: (process.env.COOKIE || '') } }
-const getRandom = (ext) => { return `${Math.floor(Math.random() * 9876541)}${(ext || '')}` }
 const porta = process.env.PORT || 3000
-let myurl = null
 
 app.set('json spaces', 4)
 app.use(express.static(__dirname + "/"))
-app.use('/publico', serveIndex((__dirname + '/publico'), { 'icons': true, 'template': (__dirname + '/static/arquivos.html') }));
+app.use('/publico', serveIndex((__dirname + '/publico'), { 'icons': true, 'template': (__dirname + '/src/static/arquivos.html') }));
 
 app.listen(porta, function () {
     console.log("Listening on port ", porta)
@@ -31,113 +24,67 @@ app.get('/url', delOldFiles, async function (req, res) {
     res.send(('url base do site: ' + await myhost(req)))
 })
 app.get('/', delOldFiles, function (req, res) {
-    res.sendFile((__dirname + '/static/home.html'))
+    res.sendFile((__dirname + '/src/static/home.html'))
 })
 app.get('/audio', delOldFiles, validateUrlRouter, async function (req, res) {
-    let urlvideo = req.query.url
-    console.log('audio ', urlvideo)
+    let { url } = req.query
+    console.log('audio ', url)
 
-    try {
-        let video = ytdl(urlvideo, { quality: 'highestaudio', requestOptions: headerObj })
+    let audio = new ytapi({ url: url })
+    let arquivo = await audio.mp3()
 
+    if (!arquivo) return res.json({ sucess: false, error: `erro ao baixar arquivo` });
 
-        let videoinfo = await getInfo(urlvideo)
-        let nomearquivo = videoinfo.videoid ? ('audio_' + videoinfo.videoid) : ('audio_' + getRandom(''))
+    let apiUrl = await myhost(req)
 
-        video.on('error', err => {
-            console.log('erro em: ', err);
-            return res.json({ 'sucess': false, "error": err.message });
-        });
+    res.json({ sucess: true, file: `${apiUrl}/arquivo/?arquivo=${arquivo}` });
 
-        ffmpeg(video)
-            .audioCodec('libmp3lame')
-            .save(`${__dirname}/publico/${nomearquivo}.mp3`)
-            .on('end', () => {
-                myhost(req)
-                    .then(url => {
-                        res.json({ 'sucess': true, 'file': `${url}/arquivo/?arquivo=${nomearquivo}.mp3` });
-                    })
-            })
-            .on('error', function (err) {
-                res.json({ 'sucess': false, "error": err.message });
-            });
-
-
-    } catch (e) {
-        console.log('erro ', e)
-        res.json({ 'sucess': false, "error": e.message });
-    }
 });
 app.get('/video', delOldFiles, validateUrlRouter, async function (req, res) {
-    let urlvideo = req.query.url
-    let bestQuality = req.query.best
+    let { url } = req.query
 
-    console.log('video ', urlvideo, 'best', bestQuality)
+    console.log('video ', url)
 
-    if (!ytdl.validateURL(urlvideo)) return res.json({ 'sucess': false, "error": 'sem url ou URL inválida' });
+    let video = new ytapi({ url: url })
+    let arquivo = await video.mp4()
 
-    try {
-        let video = await ytmixer(urlvideo)
-        if (!video) return res.json({ 'sucess': false, "error": 'erro ao processar o download' });
-        let caminho = `${__dirname}/publico/`
-        let nomearquivo = `video_${getRandom('.mp4')}`
-        let arquivo = createWriteStream((caminho + nomearquivo))
-        video.pipe(arquivo)
+    if (!arquivo) return res.json({ sucess: false, error: `erro ao baixar arquivo` });
 
-        await new Promise((res) => {
-            arquivo.on("finish", () => {
-                res()
-            })
+    let apiUrl = await myhost(req)
 
-            arquivo.on("error", () => res.json({ 'sucess': false, "error": 'convertion error' }))
-        })
-        let url = await myhost(req)
-        console.log(url)
-        return res.json({ 'sucess': true, "file": `${url}/arquivo/?arquivo=${nomearquivo}` });
-
-    } catch (e) {
-        console.log('erro ', e)
-        return res.json({ 'sucess': false, "error": e.message });
-    }
+    res.json({ sucess: true, file: `${apiUrl}/arquivo/?arquivo=${arquivo}` });
 });
 app.get('/arquivo', delOldFiles, function (req, res) {
-    let nomearquivo = req.query.arquivo
-    let caminho = `${__dirname}/publico/${nomearquivo}`
+    let { arquivo } = req.query
 
-    console.log('baixando arquivo ', nomearquivo)
+    if (!arquivo) return res.json({ sucess: false, error: 'sem arquivo' });
 
-    if (!nomearquivo || !existsSync(caminho)) return res.json({ 'sucess': false, "error": 'sem url' });
+    let caminho = `${__dirname}/publico/${arquivo}`
+
+    console.log('baixando arquivo ', arquivo)
+
+    if (!existsSync(caminho)) return res.json({ sucess: false, error: 'arquivo nao encontrado' });
 
     res.download(caminho)
 })
-app.get('/info', delOldFiles, async function (req, res) {
-    let link = req.query.url
-    console.log('get info ', link)
-    if (!ytdl.validateURL(link)) return res.json({ 'sucess': false, "error": 'sem url ou URL inválida' });
+app.get('/info', delOldFiles, validateUrlRouter, async function (req, res) {
+    let { url } = req.query
+    console.log('get info ', url)
 
-    let data = await getInfo(link)
-    return res.json(data)
+    let data = await (new ytapi({ url: url })).getInfo()
+
+    if (!data) return res.json({ sucess: false, error: 'erro ao buscar dados' })
+
+    return res.json({ sucess: true, ...data })
 })
 app.get('/buscar', delOldFiles, async function (req, res) {
     delOldFiles()
     let busca = req.query.text
     console.log('get buscar ', busca)
-    if (!busca?.length) return res.json({ 'sucess': false, "error": 'termo ou frase de busca nao fornecido' });
+    if (!busca?.length) return res.json({ sucess: false, error: 'termo ou frase de busca nao fornecido' });
 
-    let data = await buscar(busca)
+    let data = await (new ytapi()).buscar(busca)
     return res.json({ sucess: true, data: data })
 })
-
-async function myhost(req) {
-    if (myurl) return myurl;
-    // checa se o site suporta https
-    try {
-        await axios(('https://' + req.headers.host));
-        myurl = 'https://' + req.headers.host
-    } catch (error) {
-        myurl = 'http://' + req.headers.host
-    }
-    return myurl
-}
 
 

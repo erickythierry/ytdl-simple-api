@@ -2,7 +2,7 @@
 <h3 align="center">api simples de busca e download de musicas e vídeos do YouTube feita com node.js</h3>
 
 <p align="center">
-<img src="https://github.com/erickythierry/ytdl-simple-api/raw/95c5bf07b6ad6d0e7ab5cb1cf40518f3c0b4ee66/static/example.png" width="700">
+<img src="https://github.com/erickythierry/ytdl-simple-api/raw/95c5bf07b6ad6d0e7ab5cb1cf40518f3c0b4ee66/src/static/example.png" width="700">
 </p>
 <hr>
 

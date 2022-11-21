@@ -5,14 +5,14 @@
   "main": "index.js",
   "type": "module",
   "dependencies": {
-    "@ffmpeg-installer/ffmpeg": "^1.1.0",
-    "axios": "^0.27.2",
-    "dotenv": "^16.0.2",
-    "express": "^4.17.1",
-    "fluent-ffmpeg": "^2.1.2",
-    "nodemon": "^2.0.12",
-    "serve-index": "^1.9.1",
-    "yt-search": "^2.10.3",
+    "@ffmpeg-installer/ffmpeg": "latest",
+    "axios": "latest",
+    "dotenv": "latest",
+    "express": "latest",
+    "fluent-ffmpeg": "latest",
+    "nodemon": "latest",
+    "serve-index": "latest",
+    "yt-search": "latest",
     "ytdl-core": "github:GreepTheSheep/node-ytdl-core"
   },
   "scripts": {
