@@ -22,7 +22,7 @@
 &nbsp;
 ## modo de usar:
 &nbsp;
-##### https://yt.ethi.cf/buscar?text= `frase ou termo a ser buscado`
+##### http://localhost:3000/buscar?text= `frase ou termo a ser buscado`
 - a api retornará um json com um array de 5 itens contendo os dados dos videos encontrados. Segue exemplo a baixo:
 ```json
 {
@@ -47,7 +47,7 @@
 }
 ```
 &nbsp;
-##### https://yt.ethi.cf/audio?url= `link do video do youtube`
+##### http://localhost:3000/audio?url= `link do video do youtube`
 - a api retornará um json com o link de download do audio do vídeo em mp3 como no exemplo a baixo:
 ```json
 {
@@ -56,7 +56,7 @@
 }
 ```
 &nbsp;
-##### https://yt.ethi.cf/video?url= `link do video do youtube`
+##### http://localhost:3000/video?url= `link do video do youtube`
 - a api retornará um json com o link de download do vídeo em mp4 como no exemplo a baixo:
 ```json
 {
@@ -65,7 +65,7 @@
 }
 ```
 &nbsp;
-##### https://yt.ethi.cf/info?url= `link do video do youtube`
+##### http://localhost:3000/info?url= `link do video do youtube`
 - a api retornará um json com algumas informações do vídeo como no exemplo a baixo:
 ```json
 {
