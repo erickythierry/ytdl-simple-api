@@ -107,7 +107,7 @@ async function getInfo(url) {
         let info = await ytdl.getInfo(url, { requestOptions: headerObj })
 
         return {
-            sucess: true,
+            success: true,
             title: info.videoDetails.title,
             videoid: info.videoDetails.videoId,
             thumb: info.player_response.microformat.playerMicroformatRenderer.thumbnail.thumbnails[0].url,
@@ -118,7 +118,7 @@ async function getInfo(url) {
 
     } catch (error) {
         console.log('erro get info: \n', error);
-        return { 'sucess': false, 'error': error.message }
+        return { 'success': false, 'error': error.message }
     }
 }
 
@@ -133,7 +133,7 @@ async function getMp3(url) {
 
         video.on('error', err => {
             console.log('erro em: ', err);
-            return res.json({ 'sucess': false, "error": err.message });
+            return res.json({ 'success': false, "error": err.message });
         });
 
         ffmpeg(video)
@@ -142,17 +142,17 @@ async function getMp3(url) {
             .on('end', () => {
                 myhost(req)
                     .then(url => {
-                        res.json({ 'sucess': true, 'file': `${url}/arquivo/?arquivo=${nomearquivo}.mp3` });
+                        res.json({ 'success': true, 'file': `${url}/arquivo/?arquivo=${nomearquivo}.mp3` });
                     })
             })
             .on('error', function (err) {
-                res.json({ 'sucess': false, "error": err.message });
+                res.json({ 'success': false, "error": err.message });
             });
 
 
     } catch (e) {
         console.log('erro ', e)
-        res.json({ 'sucess': false, "error": e.message });
+        res.json({ 'success': false, "error": e.message });
     }
 }
 

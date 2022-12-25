@@ -26,7 +26,7 @@
 - a api retornará um json com um array de 5 itens contendo os dados dos videos encontrados. Segue exemplo a baixo:
 ```json
 {
-    "sucess": true, 
+    "success": true, 
     "data": [
     {
       "title": "Parabéns pra Você!",
@@ -51,7 +51,7 @@
 - a api retornará um json com o link de download do audio do vídeo em mp3 como no exemplo a baixo:
 ```json
 {
-    "sucess": true, 
+    "success": true, 
     "file": "url direta para baixar o audio do vídeo em formato mp3"
 }
 ```
@@ -60,7 +60,7 @@
 - a api retornará um json com o link de download do vídeo em mp4 como no exemplo a baixo:
 ```json
 {
-    "sucess": true, 
+    "success": true, 
     "file": "url direta para baixar o video em formato mp4"
 }
 ```
@@ -69,7 +69,7 @@
 - a api retornará um json com algumas informações do vídeo como no exemplo a baixo:
 ```json
 {
-    "sucess": true,
+    "success": true,
     "title" : "Titulo do video",
     "videoid" : "ID do video",
     "thumb": "URL da thumb no formato jpg",
@@ -81,7 +81,7 @@
 ##### Caso ocorra algum erro nas solicitações, a API retornará um json como o exemplo a baixo:
 ```json
 {
-    "sucess": false, 
+    "success": false, 
     "error": "a mensagem do erro ocorrido"
 }
 ```

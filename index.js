@@ -27,43 +27,43 @@ app.get('/', delOldFiles, function (req, res) {
     res.sendFile((__dirname + '/src/static/home.html'))
 })
 app.get('/audio', delOldFiles, validateUrlRouter, async function (req, res) {
-    let { url } = req.query
+    let { url, quality } = req.query
     console.log('audio ', url)
 
     let audio = new ytapi({ url: url })
     let arquivo = await audio.mp3()
 
-    if (!arquivo) return res.json({ sucess: false, error: `erro ao baixar arquivo` });
+    if (!arquivo) return res.json({ success: false, error: `erro ao baixar arquivo` });
 
     let apiUrl = await myhost(req)
 
-    res.json({ sucess: true, file: `${apiUrl}/arquivo/?arquivo=${arquivo}` });
+    res.json({ success: true, file: `${apiUrl}/arquivo/?arquivo=${arquivo}` });
 
 });
 app.get('/video', delOldFiles, validateUrlRouter, async function (req, res) {
-    let { url } = req.query
+    let { url, quality } = req.query
 
     console.log('video ', url)
 
     let video = new ytapi({ url: url })
     let arquivo = await video.mp4()
 
-    if (!arquivo) return res.json({ sucess: false, error: `erro ao baixar arquivo` });
+    if (!arquivo) return res.json({ success: false, error: `erro ao baixar arquivo` });
 
     let apiUrl = await myhost(req)
 
-    res.json({ sucess: true, file: `${apiUrl}/arquivo/?arquivo=${arquivo}` });
+    res.json({ success: true, file: `${apiUrl}/arquivo/?arquivo=${arquivo}` });
 });
 app.get('/arquivo', delOldFiles, function (req, res) {
     let { arquivo } = req.query
 
-    if (!arquivo) return res.json({ sucess: false, error: 'sem arquivo' });
+    if (!arquivo) return res.json({ success: false, error: 'sem arquivo' });
 
     let caminho = `${__dirname}/publico/${arquivo}`
 
     console.log('baixando arquivo ', arquivo)
 
-    if (!existsSync(caminho)) return res.json({ sucess: false, error: 'arquivo nao encontrado' });
+    if (!existsSync(caminho)) return res.json({ success: false, error: 'arquivo nao encontrado' });
 
     res.download(caminho)
 })
@@ -73,18 +73,18 @@ app.get('/info', delOldFiles, validateUrlRouter, async function (req, res) {
 
     let data = await (new ytapi({ url: url })).getInfo()
 
-    if (!data) return res.json({ sucess: false, error: 'erro ao buscar dados' })
+    if (!data) return res.json({ success: false, error: 'erro ao buscar dados' })
 
-    return res.json({ sucess: true, ...data })
+    return res.json({ success: true, ...data })
 })
 app.get('/buscar', delOldFiles, async function (req, res) {
     delOldFiles()
     let busca = req.query.text
     console.log('get buscar ', busca)
-    if (!busca?.length) return res.json({ sucess: false, error: 'termo ou frase de busca nao fornecido' });
+    if (!busca?.length) return res.json({ success: false, error: 'termo ou frase de busca nao fornecido' });
 
     let data = await (new ytapi()).buscar(busca)
-    return res.json({ sucess: true, data: data })
+    return res.json({ success: true, data: data })
 })
 
 

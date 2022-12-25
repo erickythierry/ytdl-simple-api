@@ -18,7 +18,7 @@ function inicio() {
                 console.log(response)
             } else {
                 response.json().then((data) => {
-                    if (!data.sucess) {
+                    if (!data.success) {
                         if (data.error.includes('410')) {
                             return showAlert(('Erro: desculpe, este video possui restriçãoes de visualização, não consigo baixar :('), 'alerta');
                         }
@@ -61,7 +61,7 @@ function download(urlType) {
                 console.log(response)
             } else {
                 response.json().then((data) => {
-                    if (!data.sucess) return showAlert(('erro: ', data.error), 'alerta');
+                    if (!data.success) return showAlert(('erro: ', data.error), 'alerta');
                     console.log(data.file)
                     var link = document.createElement('a');
                     link.href = data.file;

@@ -32,6 +32,6 @@ export async function delOldFiles(req, res, next) {
 
 export function validateUrlRouter(req, res, next) {
     let { url } = req.query
-    if (!ytdl.validateURL(url)) return res.json({ 'sucess': false, "error": 'sem url ou URL inválida' });
+    if (!ytdl.validateURL(url)) return res.json({ 'success': false, "error": 'sem url ou URL inválida' });
     next()
 }
