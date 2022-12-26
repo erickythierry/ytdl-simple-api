@@ -58,13 +58,12 @@ async function download(type, videoID, itag) {
         console.log('response', data)
         if (!data.success) return showAlert(('erro: ', data.error), 'alerta');
 
-        window.open(data.file, '_blank').focus();
-        // var link = document.createElement('a');
-        // link.href = data.file;
-        // link.download = (data.file.split('arquivo='))[1];
-        // document.body.appendChild(link);
-        // link.click();
-        // document.body.removeChild(link);
+        var link = document.createElement('a');
+        link.href = data.file;
+        link.download = (data.file.split('arquivo='))[1];
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
 
         document.getElementById('divDownload').innerHTML = ''
         document.getElementById('divDownload').innerHTML = `
