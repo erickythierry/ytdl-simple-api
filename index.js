@@ -27,10 +27,10 @@ app.get('/', delOldFiles, function (req, res) {
     res.sendFile((__dirname + '/src/static/home.html'))
 })
 app.get('/audio', delOldFiles, validateUrlRouter, async function (req, res) {
-    let { url, quality } = req.query
+    let { url, itag } = req.query
     console.log('audio ', url)
 
-    let audio = new ytapi({ url: url })
+    let audio = new ytapi({ url: url, itag: itag })
     let arquivo = await audio.mp3()
 
     if (!arquivo) return res.json({ success: false, error: `erro ao baixar arquivo` });
@@ -41,11 +41,11 @@ app.get('/audio', delOldFiles, validateUrlRouter, async function (req, res) {
 
 });
 app.get('/video', delOldFiles, validateUrlRouter, async function (req, res) {
-    let { url, quality } = req.query
+    let { url, itag } = req.query
 
     console.log('video ', url)
 
-    let video = new ytapi({ url: url })
+    let video = new ytapi({ url: url, itag: itag })
     let arquivo = await video.mp4()
 
     if (!arquivo) return res.json({ success: false, error: `erro ao baixar arquivo` });

@@ -50,10 +50,10 @@ export function getItag(lista, type = 'video') {
     if (type == 'video') return lista
         .filter(i => { // filtra apenas os formatos mp4 que sejam 720p ou 480p
             if (i.container == 'mp4') {
-                if (i.qualityLabel == '480p' || i.qualityLabel == '720p') return true //
+                if (i.qualityLabel == '360p' || i.qualityLabel == '480p' || i.qualityLabel == '720p') return true //
             }
         })
-        .map(i => { return { q: i.qualityLabel, itag: i.itag, audio: i.hasAudio, t: i.contentLength } }) // reduz para apenas as propriedades qualityLabel e itag
+        .map(i => { return { q: i.qualityLabel, itag: i.itag, audio: i.hasAudio, size: i.contentLength } }) // reduz para apenas as propriedades qualityLabel e itag
         .sort((a, b) => { // organiza em sequencia as qualidades para que 720p fique sempre em primeiro
             if (parseInt(a.q) > parseInt(b.q)) return -1
             return 1
@@ -68,7 +68,7 @@ export function getItag(lista, type = 'video') {
                 if (i.audioBitrate >= 128) return true
             }
         })
-        .map(i => { return { bitrate: i.audioBitrate, itag: i.itag, t: i.contentLength } })
+        .map(i => { return { bitrate: i.audioBitrate, itag: i.itag, size: i.contentLength } })
         .sort((a, b) => {
             if (a.bitrate > b.bitrate) return -1
             return 1

@@ -12,7 +12,7 @@ export async function mp3(data) {
     let itag = data?.itag || 'highestaudio'
     try {
         let videoinfo = await ytdl.getInfo(data?.url)
-        let nomearquivo = videoinfo.videoid ? ('audio_' + videoinfo.videoid) : ('audio_' + getRandom(''))
+        let nomearquivo = videoinfo.videoDetails.videoId ? ('audio_' + videoinfo.videoDetails.videoId) : ('audio_' + getRandom(''))
         let audio = ytdl.downloadFromInfo(videoinfo, { quality: itag, requestOptions: { headers: { cookie: cookie } } })
 
         let result = await new Promise((res, rej) => {
@@ -23,7 +23,7 @@ export async function mp3(data) {
                     res(`${nomearquivo}.mp3`)
                 })
                 .on('error', function (err) {
-                    console.log(err)
+                    console.log('ffmpeg mp3 erro:', err)
                     res()
                 });
         })

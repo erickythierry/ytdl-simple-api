@@ -1,9 +1,9 @@
-function inicio() {
-
+async function inicio() {
 
     linkvideo = document.getElementById('linkvideo').value
     if (!linkvideo || linkvideo.length < 20) return showAlert('Preencha a url corretamente', 'alerta')
-
+    if (!linkvideo.includes('http')) linkvideo = 'https://' + linkvideo
+    console.log(linkvideo)
     loadingBtn('botaobuscar')
 
     var requestOptions = {
@@ -11,39 +11,32 @@ function inicio() {
         redirect: 'follow'
     };
 
-    fetch(`/info?url=${linkvideo}`, requestOptions)
-        .then(response => {
-            if (response.status != 200) {
-                showAlert('erro: o servidor não respondeu como deveria :(', 'alerta')
-                console.log(response)
-            } else {
-                response.json().then((data) => {
-                    if (!data.success) {
-                        if (data.error.includes('410')) {
-                            return showAlert(('Erro: desculpe, este video possui restriçãoes de visualização, não consigo baixar :('), 'alerta');
-                        }
-                        return showAlert(('erro: ' + data.error), 'alerta');
-                    }
+    try {
+        let response = await fetch(`/info?url=${linkvideo}`, requestOptions)
 
-                    document.getElementById('formulario').innerHTML = downloadScreen(data)
-                    showVoltarBtn()
+        if (response.status != 200) {
+            showAlert('erro: o servidor não respondeu como deveria :(', 'alerta')
+            return console.log(response)
+        }
 
-                }).catch((err) => {
-
-                    console.log(err);
-                    showAlert('erro!')
-                })
+        let data = await response.json()
+        if (!data.success) {
+            if (data.error.includes('410')) {
+                return showAlert(('Erro: desculpe, este video possui restriçãoes de visualização, não consigo baixar :('), 'alerta');
             }
+            return showAlert(('erro: ' + data.error), 'alerta');
+        }
 
-        })
-        .catch(error => {
-            showAlert('Erro - sem conexão com o servidor')
-            console.log(error)
+        document.getElementById('formulario').innerHTML = downloadScreen(data)
+        showVoltarBtn()
 
-        });
+    } catch (error) {
+        showAlert('Erro - sem conexão com o servidor')
+        console.log(error)
+    }
 }
 
-function download(urlType) {
+async function download(type, videoID, itag) {
 
     loadingBtn('divDownload')
 
@@ -52,45 +45,37 @@ function download(urlType) {
         redirect: 'follow'
     };
 
-    var type = urlType.startsWith('video_') ? 'video' : 'audio'
+    try {
+        let finalUrl = `/${type}?url=https://youtu.be/${videoID}` + (itag ? "&itag=" + itag : '')
+        console.log('baixando', finalUrl)
+        let response = await fetch(finalUrl, requestOptions)
 
-    fetch(`/${type}?url=${linkvideo}&best=true`, requestOptions)
-        .then(response => {
-            if (response.status != 200) {
-                showAlert('erro: o servidor não respondeu como deveria :(', 'alerta')
-                console.log(response)
-            } else {
-                response.json().then((data) => {
-                    if (!data.success) return showAlert(('erro: ', data.error), 'alerta');
-                    console.log(data.file)
-                    var link = document.createElement('a');
-                    link.href = data.file;
-                    link.download = (data.file.split('arquivo='))[1];
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
+        if (response.status != 200) {
+            showAlert('erro: o servidor não respondeu como deveria :(', 'alerta')
+            return console.log(response)
+        }
+        let data = await response.json()
+        console.log('response', data)
+        if (!data.success) return showAlert(('erro: ', data.error), 'alerta');
 
-                    document.getElementById('divDownload').innerHTML = ''
-                    document.getElementById('divDownload').innerHTML = `
-                <div class="alert alert-success" role="alert">
-                    <span class="material-icons">done</span>
-                </div>`
+        window.open(data.file, '_blank').focus();
+        // var link = document.createElement('a');
+        // link.href = data.file;
+        // link.download = (data.file.split('arquivo='))[1];
+        // document.body.appendChild(link);
+        // link.click();
+        // document.body.removeChild(link);
 
+        document.getElementById('divDownload').innerHTML = ''
+        document.getElementById('divDownload').innerHTML = `
+            <div class="alert alert-success" role="alert">
+                <span class="material-icons">done</span>
+            </div>`
 
-                }).catch((err) => {
-
-                    console.log(err);
-                    showAlert('erro!')
-                })
-            }
-
-        })
-        .catch(error => {
-            showAlert('Erro - sem conexão com o servidor')
-            console.log(error)
-
-        });
-
+    } catch (error) {
+        showAlert('Erro - sem conexão com o servidor')
+        console.log(error)
+    }
 }
 
 function loadingBtn(id) {
@@ -130,22 +115,34 @@ function resetBtnBuscar() {
 }
 
 function downloadScreen(data) {
-    return `
-    <p class="h3 text-muted">${data.title}</p>
-        <img class="img-fluid rounded mt-2" src="${data.thumb}">
-        <p class="mt-3 text-light text-muted">
-            <strong>Duração:</strong> ${sToTime(data.duration)} <br><strong>Visualizações:</strong> ${data.views}
-        </p>
-        
-        
-        <div id="divDownload" class="mt-4">
-            <p class="text-muted text-light h5">
-                baixar:
-            </p>
-            <p type="button" class="btn btn-lg btn-danger" id="botaovideo" onclick="download('video_${data.videoid}')">Video <span class="material-icons">smart_display</span></p>
-            <p type="button" class="btn btn-lg btn-danger" id="botaoaudio" onclick="download('audio_${data.videoid}')">Audio <span class="material-icons">audiotrack</span></p>
-        </div>
 
+    let titulo = `<p class="h3 text-muted">${data.title}</p>`
+    let thumb = `<img class="img-fluid rounded mt-2" src="${data.thumb}">`
+    let dados = `<p class="mt-3 text-light text-muted">
+    <strong>Duração:</strong> ${sToTime(data.duration)} <br><strong>Visualizações:</strong> ${data.views}
+    </p>`
+    let video = filterDuplicates(data.video, 'q')
+    let videoBotoes = video.map(video => {
+        return `<p type="button" class="btn btn-lg btn-danger" id="botaovideo" onclick="download('video', '${data.videoid}', '${video.itag}')">Video ${video.q} <span class="material-icons">smart_display</span></p>`
+    })
+    let audioBotoes = data.audio.map(audio => {
+        return `<p type="button" class="btn btn-lg btn-danger" id="botaoaudio" onclick="download('audio', '${data.videoid}', '${audio.itag}')">Audio ${audio.bitrate}kbps <span class="material-icons">audiotrack</span></p>`
+    })
+    let divDownload = `
+    <div id="divDownload" class="mt-4">
+        <p class="text-muted text-light h3">
+            baixar:
+        </p>
+        ${videoBotoes.join('\n')}
+        ${audioBotoes.join('\n')}
+    </div>`
+
+    return `
+        ${titulo}
+        ${thumb}
+        ${dados}
+        ${divDownload}
+        
         <p type="button" class="btn btn-lg mt-2" id="botaovoltar" onClick="window.location.reload();">Voltar</p>`
 }
 
@@ -169,4 +166,10 @@ function sToTime(duration) {
 
 function showVoltarBtn() {
     document.getElementById("botaovoltar").style.visibility = "visible";
+}
+
+function filterDuplicates(array, param) {
+    return array.filter((item, index, self) =>
+        self.findIndex(other => other[param] === item[param]) === index
+    );
 }
