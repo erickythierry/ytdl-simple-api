@@ -6,61 +6,63 @@ import { mp4 } from "./mp4.js";
 export const cookie = process.env.COOKIE || ""
 
 
-export default class ytapi {
-    constructor(data) {
-        this.data = data
-    }
+export default function ytapi(data) {
 
-    async buscar(text) {
-        return await b(text)
-    }
-    async mp4() {
-        return await mp4(this.data)
-    }
-    async mp3() {
-        return await mp3(this.data)
-    }
-    async getInfo() {
-        if (!this.data?.url) return;
-        try {
-            let videoinfo = await ytdl.getInfo(this.data?.url)
-            let video_itag = getItag(videoinfo.formats)
-            let audio_itag = getItag(videoinfo.formats, 'audio')
-            //console.log(videoinfo.videoDetails)
-            return {
-                videoDetails: videoinfo.videoDetails,
-                video: video_itag,
-                audio: audio_itag,
-                title: videoinfo.videoDetails.title,
-                videoid: videoinfo.videoDetails.videoId,
-                thumb: videoinfo.player_response.microformat.playerMicroformatRenderer.thumbnail.thumbnails[0].url,
-                duration: videoinfo.videoDetails.lengthSeconds,
-                views: videoinfo.videoDetails.viewCount
+    return {
+        buscar: async (text) => {
+            return await b(text)
+        },
+        mp4: async () => {
+            return await mp4(data)
+        },
+        mp3: async () => {
+            return await mp3(data)
+        },
+        getInfo: async () => {
+            if (!data?.url) return;
+            try {
+                let videoinfo = await ytdl.getInfo(data?.url)
+                let video_itag = getItag(videoinfo.formats)
+                let audio_itag = getItag(videoinfo.formats, 'audio')
+                return {
+                    video: video_itag,
+                    audio: audio_itag,
+                    title: videoinfo.videoDetails.title,
+                    videoid: videoinfo.videoDetails.videoId,
+                    thumb: videoinfo.player_response.microformat.playerMicroformatRenderer.thumbnail.thumbnails[0].url,
+                    duration: videoinfo.videoDetails.lengthSeconds,
+                    views: videoinfo.videoDetails.viewCount,
+                    videoDetails: videoinfo.videoDetails
+                }
+            } catch (error) {
+                console.log(error)
+                return;
             }
-        } catch (error) {
-            console.log(error)
-            return;
         }
-
     }
 };
 
 
 export function getItag(lista, type = 'video') {
-    if (type == 'video') return lista
-        .filter(i => { // filtra apenas os formatos mp4 que sejam 720p ou 480p
-            if (i.container == 'mp4') {
-                if (i.qualityLabel == '360p' || i.qualityLabel == '480p' || i.qualityLabel == '720p') return true //
-            }
-        })
-        .map(i => { return { q: i.qualityLabel, itag: i.itag, audio: i.hasAudio, size: i.contentLength } }) // reduz para apenas as propriedades qualityLabel e itag
-        .sort((a, b) => { // organiza em sequencia as qualidades para que 720p fique sempre em primeiro
-            if (parseInt(a.q) > parseInt(b.q)) return -1
-            return 1
-        }).sort((a, b) => {
-            if (a.audio == true) return -1;
-            return 1
-        })
+    if (type == 'video') {
+        lista = lista
+            .filter(i => { // filtra apenas os formatos mp4 que sejam 720p ou 480p
+                if (i.container == 'mp4') {
+                    if (i.qualityLabel == '360p' || i.qualityLabel == '480p' || i.qualityLabel == '720p') return true //
+                }
+            })
+            .map(i => { return { q: i.qualityLabel, itag: i.itag, audio: i.hasAudio, size: i.contentLength } }) // reduz para apenas as propriedades qualityLabel e itag
+        lista = filterDuplicates(lista, 'q')
+
+        return lista
+            .sort((a, b) => { // organiza em sequencia as qualidades para que 720p fique sempre em primeiro
+                if (parseInt(a.q) > parseInt(b.q)) return -1
+                return 1
+            }).sort((a, b) => {
+                if (a.audio == true) return -1;
+                return 1
+            })
+    }
 
     return lista
         .filter(i => {
@@ -73,4 +75,10 @@ export function getItag(lista, type = 'video') {
             if (a.bitrate > b.bitrate) return -1
             return 1
         })
+}
+
+function filterDuplicates(array, param) {
+    return array.filter((item, index, self) =>
+        self.findIndex(other => other[param] === item[param]) === index
+    );
 }

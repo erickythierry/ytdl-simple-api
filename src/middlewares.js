@@ -23,9 +23,8 @@ export async function delOldFiles(req, res, next) {
                     unlinkSync(file)
                 }
             }
-
-        });
-    });
+        })
+    })
 
     if (req) next()
 }

@@ -1,6 +1,5 @@
 import yts from 'yt-search';
 
-
 export async function buscar(search) {
     if (!search) return 'sem busca'
     const busca = await yts(search)

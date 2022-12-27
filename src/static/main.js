@@ -120,8 +120,7 @@ function downloadScreen(data) {
     let dados = `<p class="mt-3 text-light text-muted">
     <strong>Duração:</strong> ${sToTime(data.duration)} <br><strong>Visualizações:</strong> ${data.views}
     </p>`
-    let video = filterDuplicates(data.video, 'q')
-    let videoBotoes = video.map(video => {
+    let videoBotoes = data.video.map(video => {
         return `<p type="button" class="btn btn-lg btn-danger" id="botaovideo" onclick="download('video', '${data.videoid}', '${video.itag}')">Video ${video.q} <span class="material-icons">smart_display</span></p>`
     })
     let audioBotoes = data.audio.map(audio => {
@@ -165,10 +164,4 @@ function sToTime(duration) {
 
 function showVoltarBtn() {
     document.getElementById("botaovoltar").style.visibility = "visible";
-}
-
-function filterDuplicates(array, param) {
-    return array.filter((item, index, self) =>
-        self.findIndex(other => other[param] === item[param]) === index
-    );
 }

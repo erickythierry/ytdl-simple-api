@@ -30,7 +30,7 @@ app.get('/audio', delOldFiles, validateUrlRouter, async function (req, res) {
     let { url, itag } = req.query
     console.log('audio ', url)
 
-    let audio = new ytapi({ url: url, itag: itag })
+    let audio = ytapi({ url: url, itag: itag })
     let arquivo = await audio.mp3()
 
     if (!arquivo) return res.json({ success: false, error: `erro ao baixar arquivo` });
@@ -45,7 +45,7 @@ app.get('/video', delOldFiles, validateUrlRouter, async function (req, res) {
 
     console.log('video ', url)
 
-    let video = new ytapi({ url: url, itag: itag })
+    let video = ytapi({ url: url, itag: itag })
     let arquivo = await video.mp4()
 
     if (!arquivo) return res.json({ success: false, error: `erro ao baixar arquivo` });
@@ -71,7 +71,7 @@ app.get('/info', delOldFiles, validateUrlRouter, async function (req, res) {
     let { url } = req.query
     console.log('get info ', url)
 
-    let data = await (new ytapi({ url: url })).getInfo()
+    let data = await ytapi({ url: url }).getInfo()
 
     if (!data) return res.json({ success: false, error: 'erro ao buscar dados' })
 
@@ -81,9 +81,9 @@ app.get('/buscar', delOldFiles, async function (req, res) {
     delOldFiles()
     let busca = req.query.text
     console.log('get buscar ', busca)
-    if (!busca?.length) return res.json({ success: false, error: 'termo ou frase de busca nao fornecido' });
+    if (!busca?.length) return res.json({ success: false, error: 'termo ou frase de busca não fornecido' });
 
-    let data = await (new ytapi()).buscar(busca)
+    let data = await ytapi().buscar(busca)
     return res.json({ success: true, data: data })
 })
 
