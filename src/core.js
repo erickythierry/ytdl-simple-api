@@ -1,9 +1,10 @@
 import axios from "axios"
+import crypto from 'crypto'
 
 
 let myurl = null
 
-export const getRandom = (ext) => { return `${Math.floor(Math.random() * 9876541)}${(ext || '')}` }
+export const getRandom = (ext) => { return `${crypto.randomUUID().split('-').slice(-1) + (ext ?? '')}` }
 
 export async function myhost(req) {
     if (myurl) return myurl;
