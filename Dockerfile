@@ -1,7 +1,8 @@
 FROM node:current-alpine
 WORKDIR /app
 COPY ./ /app
-RUN npm install && npm cache clean --force
+RUN npm install
+RUN npm install pm2 -g
 ENV PORT 80
 EXPOSE 80
-CMD [ "npm", "start" ]
+CMD ["pm2-runtime", "pm2.json"]

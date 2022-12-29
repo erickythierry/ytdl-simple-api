@@ -1,0 +1,8 @@
+{
+    "apps": [
+        {
+            "name": "ytapi",
+            "script": "./index.js"
+        }
+    ]
+}
