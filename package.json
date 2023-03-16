@@ -10,7 +10,7 @@
     "dotenv": "latest",
     "express": "latest",
     "fluent-ffmpeg": "latest",
-    "serve-index": "latest",
+    "serve-index": "github:expressjs/serve-index",
     "yt-search": "latest",
     "ytdl-core": "github:fent/node-ytdl-core"
   },

@@ -14,7 +14,7 @@ const porta = process.env.PORT || 3000
 
 app.set('json spaces', 4)
 app.use(express.static(__dirname + "/"))
-app.use('/publico', serveIndex((__dirname + '/publico'), { 'icons': true, 'template': (__dirname + '/src/static/arquivos.html') }));
+app.use('/publico', serveIndex((__dirname + '/publico'), { 'icons': true, 'template': (__dirname + '/src/static/arquivos.html'), stylesheet:(__dirname + '/src/static/arquivos.css')  }));
 
 app.listen(porta, function () {
     console.log("Listening on port ", porta)
