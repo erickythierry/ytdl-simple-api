@@ -1,7 +1,6 @@
 import axios from "axios"
 import crypto from 'crypto'
 
-
 let myurl = null
 
 export const getRandom = (ext) => { return `${crypto.randomUUID().split('-').slice(-1) + (ext ?? '')}` }
