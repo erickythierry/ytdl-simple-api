@@ -14,7 +14,7 @@ const porta = process.env.PORT || 3000
 
 app.set('json spaces', 4)
 app.use(express.static(__dirname + "/"))
-app.use('/publico', serveIndex((__dirname + '/publico'), { 'icons': true, 'template': (__dirname + '/src/static/arquivos.html'), stylesheet:(__dirname + '/src/static/arquivos.css')  }));
+app.use('/publico', serveIndex((__dirname + '/publico'), { 'icons': true, 'template': (__dirname + '/src/static/arquivos.html'), stylesheet: (__dirname + '/src/static/arquivos.css') }));
 
 app.listen(porta, function () {
     console.log("Listening on port ", porta)
@@ -76,6 +76,16 @@ app.get('/info', delOldFiles, validateUrlRouter, async function (req, res) {
     if (!data) return res.json({ success: false, error: 'erro ao buscar dados' })
 
     return res.json({ success: true, ...data })
+})
+app.get('/formats', delOldFiles, validateUrlRouter, async function (req, res) {
+    let { url } = req.query
+    console.log('get formats ', url)
+
+    let data = await ytapi({ url: url }).getFormats()
+
+    if (!data) return res.json({ success: false, error: 'erro ao buscar dados' })
+
+    return res.json({ success: true, data: data })
 })
 app.get('/buscar', delOldFiles, async function (req, res) {
     delOldFiles()

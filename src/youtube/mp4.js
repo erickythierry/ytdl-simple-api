@@ -36,20 +36,34 @@ export async function mp4(data) {
 }
 
 async function convert(video, audio) {
-    return await new Promise((res) => {
+    return new Promise((resolve, reject) => {
         ffmpeg()
-            .addInput(('./publico/' + video))
-            .addInput(('./publico/' + audio))
+            .addInput(`./publico/${video}`)
+            .addInput(`./publico/${audio}`)
             .addOptions(['-map 0:v', '-map 1:a', '-c:v copy'])
-            .format('mp4')
-            .on('error', error => {
-                console.log(error)
-                res()
-            })
-            .on('end', () => {
-                res(("merged_" + video))
-            })
-            .saveToFile(("./publico/merged_" + video))
-    })
+            .outputOptions('-movflags frag_keyframe+empty_moov')
+            .output(`./publico/merged_${video}`)
+            .on('error', (err) => reject(err))
+            .on('end', () => resolve(`merged_${video}`))
+            .run();
+    });
 }
+
+// async function convert(video, audio) {
+//     return await new Promise((res) => {
+//         ffmpeg()
+//             .addInput(('./publico/' + video))
+//             .addInput(('./publico/' + audio))
+//             .addOptions(['-map 0:v', '-map 1:a', '-c:v copy'])
+//             .format('mp4')
+//             .on('error', error => {
+//                 console.log(error)
+//                 res()
+//             })
+//             .on('end', () => {
+//                 res(("merged_" + video))
+//             })
+//             .saveToFile(("./publico/merged_" + video))
+//     })
+// }
 

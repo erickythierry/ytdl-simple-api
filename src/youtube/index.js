@@ -38,6 +38,16 @@ export default function ytapi(data) {
                 console.log(error)
                 return;
             }
+        },
+        getFormats: async () => {
+            if (!data?.url) return;
+            try {
+                let videoinfo = await ytdl.getInfo(data?.url)
+                return videoinfo.formats
+            } catch (error) {
+                console.log(error)
+                return;
+            }
         }
     }
 };
