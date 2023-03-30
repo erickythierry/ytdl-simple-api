@@ -96,5 +96,3 @@ app.get('/buscar', delOldFiles, async function (req, res) {
     let data = await ytapi().buscar(busca)
     return res.json({ success: true, data: data })
 })
-
-
