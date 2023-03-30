@@ -1,32 +1,36 @@
-import { readdir, statSync, unlinkSync } from 'fs';
+import { readdir, unlink } from 'fs/promises';
 import ytdl from 'ytdl-core';
 
 const pasta = './publico/'
 
 export async function delOldFiles(req, res, next) {
+    try {
+        const files = await readdir(pasta);
 
-    readdir(pasta, function (err, files) {
-        //handling error
-        if (err) {
-            return console.log('Unable to scan directory: ' + err);
-        }
-        //listing all files using forEach
-        files.forEach(function (file) {
-            file = (pasta + file)
-            if (file.includes('.mp3') || file.includes('.mp4')) {
-                let stats = statSync(file);
-                let modificado = new Date(stats.ctime).getTime()
-                let agora = new Date().getTime();
-                let data = (agora - modificado) / 1000
-                if (data > 600) {
-                    console.log('apagando', file)
-                    unlinkSync(file)
-                }
+        for (const file of files) {
+            const filePath = `${pasta}/${file}`;
+
+            if (!file.match(/\.mp3$|\.mp4$/i)) {
+                continue;
             }
-        })
-    })
 
-    if (req) next()
+            const { ctime } = await stat(filePath);
+            const modificado = new Date(ctime).getTime();
+            const agora = Date.now();
+            const data = (agora - modificado) / 1000;
+
+            if (data > 600) {
+                console.log('🗑️', filePath);
+                await unlink(filePath);
+            }
+        }
+    } catch (error) {
+        console.error('Unable to scan directory:', error);
+    }
+
+    if (next) {
+        next();
+    }
 }
 
 export function validateUrlRouter(req, res, next) {
