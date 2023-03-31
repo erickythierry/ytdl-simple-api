@@ -1,4 +1,4 @@
-import { readdir, unlink } from 'fs/promises';
+import { readdir, unlink, stat } from 'fs/promises';
 import ytdl from 'ytdl-core';
 
 const pasta = './publico/'
