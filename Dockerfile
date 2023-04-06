@@ -1,4 +1,4 @@
-FROM node:18.14.2-alpine
+FROM node:lts-alpine
 WORKDIR /app
 COPY package*.json ./
 RUN apk update && apk add --no-cache ffmpeg
