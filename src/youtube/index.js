@@ -1,4 +1,4 @@
-import ytdl from 'ytdl-core';
+import ytdl from '@distube/ytdl-core';
 import { buscar as b } from "./buscar.js";
 import { mp3 } from "./mp3.js";
 import { mp4 } from "./mp4.js";

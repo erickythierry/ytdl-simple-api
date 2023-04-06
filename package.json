@@ -5,14 +5,14 @@
   "main": "index.js",
   "type": "module",
   "dependencies": {
+    "@distube/ytdl-core": "^4.11.7",
     "@ffmpeg-installer/ffmpeg": "*",
     "axios": "latest",
     "dotenv": "latest",
     "express": "latest",
     "fluent-ffmpeg": "*",
     "serve-index": "github:expressjs/serve-index",
-    "yt-search": "latest",
-    "ytdl-core": "^4.9.1"
+    "yt-search": "latest"
   },
   "scripts": {
     "start": "node index.js"

@@ -1,5 +1,5 @@
 import { readdir, unlink, stat } from 'fs/promises';
-import ytdl from 'ytdl-core';
+import ytdl from '@distube/ytdl-core';
 
 const pasta = './publico/'
 
