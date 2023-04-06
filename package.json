@@ -5,11 +5,11 @@
   "main": "index.js",
   "type": "module",
   "dependencies": {
-    "@ffmpeg-installer/ffmpeg": "latest",
+    "@ffmpeg-installer/ffmpeg": "*",
     "axios": "latest",
     "dotenv": "latest",
     "express": "latest",
-    "fluent-ffmpeg": "latest",
+    "fluent-ffmpeg": "*",
     "serve-index": "github:expressjs/serve-index",
     "yt-search": "latest",
     "ytdl-core": "^4.9.1"
