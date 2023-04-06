@@ -1,7 +1,7 @@
 FROM node:lts-alpine
 WORKDIR /app
 COPY package*.json ./
-RUN apk update && apk add --no-cache ffmpeg
+RUN apk update && apk add --no-cache ffmpeg git
 RUN npm install
 RUN npm cache clean --force
 COPY . .
