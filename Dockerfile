@@ -1,7 +1,7 @@
 FROM node:18.14.2-alpine
 WORKDIR /app
 COPY package*.json ./
-RUN apk update && apk install ffmpeg
+RUN apk update && apk add --no-cache ffmpeg
 RUN npm install
 RUN npm cache clean --force
 COPY . .
