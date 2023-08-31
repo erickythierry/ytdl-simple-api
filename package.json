@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "dependencies": {
-    "@distube/ytdl-core": "^4.11.7",
+    "@distube/ytdl-core": "latest",
     "@ffmpeg-installer/ffmpeg": "*",
     "axios": "latest",
     "dotenv": "latest",
