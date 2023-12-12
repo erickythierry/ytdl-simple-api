@@ -13,12 +13,15 @@ export async function mp4(data) {
     if (!data?.url) return;
     try {
         let videoinfo = await ytdl.getInfo(data?.url)
+        console.log(getItag(videoinfo.formats))
         let selected = getItag(videoinfo.formats)[0]
         let itag = data?.itag || selected.itag
-        let nomearquivo = 'video_' + getRandom('.mp4')
+        let videoID = videoinfo?.videoDetails?.videoId
+        let nomearquivo = 'video_' + (videoID || getRandom('')) + '.mp4'
         let arquivo = fs.createWriteStream(('./publico/' + nomearquivo))
 
-        ytdl.downloadFromInfo(videoinfo, { quality: itag, format: 'mp4', requestOptions: { headers: { cookie: cookie } } }).pipe(arquivo)
+        ytdl.downloadFromInfo(videoinfo, { quality: itag, format: 'mp4', requestOptions: { headers: { cookie: cookie } } })
+            .pipe(arquivo)
 
         let resultado = await Promise.allSettled([
             new Promise((resolve) => arquivo.on('finish', resolve())),

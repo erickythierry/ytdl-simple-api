@@ -13,7 +13,8 @@ export async function mp3(data) {
     let itag = data?.itag || 'highestaudio'
     try {
         let videoinfo = await ytdl.getInfo(data?.url)
-        let nomearquivo = 'audio_' + getRandom('.mp3')
+        let videoID = videoinfo?.videoDetails?.videoId
+        let nomearquivo = 'audio_' + (videoID || getRandom('')) + '.mp3'
         let audio = ytdl.downloadFromInfo(videoinfo, { quality: itag, requestOptions: { headers: { cookie: cookie } } })
 
         let result = await new Promise((res, rej) => {

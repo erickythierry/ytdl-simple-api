@@ -21,9 +21,8 @@ async function inicio() {
 
         let data = await response.json()
         if (!data.success) {
-            if (data.error.includes('410')) {
-                return showAlert(('Erro: desculpe, este video possui restriçãoes de visualização, não consigo baixar :('), 'alerta');
-            }
+            if (data.error.includes('410')) return showAlert(('Erro: desculpe, este video possui restriçãoes de visualização, não consigo baixar :('), 'alerta');
+            resetBtnBuscar()
             return showAlert(('erro: ' + data.error), 'alerta');
         }
 

@@ -1,9 +1,10 @@
-FROM node:lts-alpine
+FROM node:21-alpine3.18
 WORKDIR /app
 COPY package*.json ./
-RUN apk update && apk add --no-cache ffmpeg git
-RUN npm install
-RUN npm cache clean --force
+COPY yarn.lock ./
+RUN apk update
+RUN yarn
+RUN yarn cache clean
 COPY . .
 ENV PORT 80
 EXPOSE 80
