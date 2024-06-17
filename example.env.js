@@ -1,9 +1,0 @@
-// para ter o seu cookie
-// - abra a pagina do Youtube (de preferencia com uma conta logada)
-// - abra o DevTools (pressione F12)
-// - Vá para a aba Network
-// - clique na requisição do youtube a esquerta
-// - role a visualização ate "Request Headers"
-// - encontre a opção "cookie" header e copie todo o conteudo
-
-const COOKIE = ``

@@ -20,6 +20,13 @@
 - saiba mais sobre o CapRover <a href="https://caprover.com/">Aqui</a>
 
 &nbsp;
+## Use seu próprio cookie
+- Baixe essa extenção em seu navegador: <a href="https://www.editthiscookie.com/">EditThisCookie</a>
+- Abra o Youtube e faça login (de preferência uma conta nova para não usar a sua pessoal)
+- Clique na extenção e depois clique em "export"
+- Seu cookie será copiado para a área de transferêcia, salve na raiz do projeto como `cookie.json`
+
+&nbsp;
 ## modo de usar:
 &nbsp;
 ##### http://localhost:3000/buscar?text= `frase ou termo a ser buscado`
