@@ -6,4 +6,4 @@
 // - role a visualização ate "Request Headers"
 // - encontre a opção "cookie" header e copie todo o conteudo
 
-COOKIE=""
+const COOKIE = ``

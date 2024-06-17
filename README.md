@@ -9,7 +9,7 @@
 &nbsp;
 ## Deploy Local
  - Clone esse projeto, acesse a pasta raiz e execute o comando `npm install` ou `yarn` 
- - Crie o arquivo `.env` na raiz do projeto (veja o arquivo `.example.env` para entender como criar seu arquivo com seu cookie do youtube)
+ - Crie o arquivo `env.js` na raiz do projeto (veja o arquivo `example.env.js` para entender como criar seu arquivo com seu cookie do youtube)
  - Após isso, execute `npm start`
  - O endpoint do projeto vai estar em `http://localhost:3000`
 

@@ -2,8 +2,9 @@ import ytdl from '@distube/ytdl-core';
 import { buscar as b } from "./buscar.js";
 import { mp3 } from "./mp3.js";
 import { mp4 } from "./mp4.js";
+import COOKIE from "../../env.js"
 
-export const cookie = process.env.COOKIE || ""
+export const cookie = COOKIE || ""
 
 
 export default function ytapi(data) {

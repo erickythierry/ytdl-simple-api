@@ -81,3 +81,4 @@ typings/
 */*.m4a
 */*.webm
 t.js
+env.js
