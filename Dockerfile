@@ -1,10 +1,9 @@
 FROM node:21-alpine3.18
 WORKDIR /app
 COPY package*.json ./
-COPY yarn.lock ./
 RUN apk update
-RUN yarn
-RUN yarn cache clean
+RUN npm i
+RUN npm cache clean --force
 COPY . .
 ENV PORT 80
 EXPOSE 80
