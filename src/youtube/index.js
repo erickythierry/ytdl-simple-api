@@ -82,7 +82,7 @@ export function getItag(lista, type = 'video') {
 
     let result = lista
         .filter(i => {
-            if (i.mimeType.includes('audio/')) {
+            if (i.mimeType?.includes('audio')) {
                 if (i.audioBitrate >= 128) return true
             }
         })
