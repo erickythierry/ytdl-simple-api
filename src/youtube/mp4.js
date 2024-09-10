@@ -38,6 +38,28 @@ export async function mp4(data) {
     }
 }
 
+export async function rawMp4(data) {
+    if (!data?.url) return;
+    try {
+        let videoinfo = await ytdl.getInfo(data?.url, { agent })
+        console.log(getItag(videoinfo.formats))
+        let selected = getItag(videoinfo.formats)[0]
+        let itag = data?.itag || selected.itag
+        let videoID = videoinfo?.videoDetails?.videoId
+        let nomearquivo = 'video_' + (videoID || getRandom('')) + '.mp4'
+        let arquivo = fs.createWriteStream(('./publico/' + nomearquivo))
+
+        ytdl.downloadFromInfo(videoinfo, { quality: itag, format: 'mp4', agent })
+            .pipe(arquivo)
+
+        await new Promise((resolve) => arquivo.on('finish', resolve()))
+        return nomearquivo
+
+    } catch (e) {
+        console.log('erro ', e)
+    }
+}
+
 async function convert(video, audio) {
     return await new Promise((res) => {
         ffmpeg()

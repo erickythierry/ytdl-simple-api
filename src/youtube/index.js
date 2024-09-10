@@ -2,8 +2,8 @@ import ytdl from '@distube/ytdl-core';
 import "dotenv/config"
 import fs from 'fs'
 import { buscar as b } from "./buscar.js";
-import { mp3 } from "./mp3.js";
-import { mp4 } from "./mp4.js";
+import { mp3, rawAudio } from "./mp3.js";
+import { mp4, rawMp4 } from "./mp4.js";
 
 export let agent = undefined
 
@@ -21,8 +21,14 @@ export default function ytapi(data) {
         mp4: async () => {
             return await mp4(data)
         },
+        rawMp4: async () => {
+            return await rawMp4(data)
+        },
         mp3: async () => {
             return await mp3(data)
+        },
+        rawAudio: async () => {
+            return await rawAudio(data)
         },
         getInfo: async () => {
             if (!data?.url) return;

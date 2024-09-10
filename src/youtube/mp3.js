@@ -1,6 +1,7 @@
 import ytdl from '@distube/ytdl-core';
 import { path as ffmpegPath } from '@ffmpeg-installer/ffmpeg';
 import ffmpeg from 'fluent-ffmpeg';
+import fs from 'fs'
 
 import { agent } from './index.js';
 import { getRandom } from "../core.js"
@@ -30,6 +31,27 @@ export async function mp3(data) {
                 });
         })
         return result
+
+    } catch (e) {
+        console.log('erro ', e)
+    }
+}
+
+export async function rawAudio(data) {
+    if (!data?.url) return;
+    let itag = data?.itag || 'highestaudio'
+    try {
+        let videoinfo = await ytdl.getInfo(data?.url, { agent })
+        let videoID = videoinfo?.videoDetails?.videoId
+        // Identifica o formato de contêiner do áudio
+        let audioFormat = videoinfo.formats.find(f => f.itag === itag || f.audioQuality)?.container || 'mp3';
+        let nomearquivo = 'audio_' + (videoID || getRandom('')) + '.' + audioFormat;
+        let arquivo = fs.createWriteStream('./publico/' + nomearquivo);
+
+        // Faz o download do áudio
+        ytdl.downloadFromInfo(videoinfo, { quality: itag, agent }).pipe(arquivo)
+        await new Promise((resolve) => arquivo.on('finish', resolve()))
+        return nomearquivo;
 
     } catch (e) {
         console.log('erro ', e)

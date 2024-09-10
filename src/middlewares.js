@@ -10,9 +10,7 @@ export async function delOldFiles(req, res, next) {
         for (const file of files) {
             const filePath = `${pasta}/${file}`;
 
-            if (!file.match(/\.mp3$|\.mp4$/i)) {
-                continue;
-            }
+            if (file.includes('.vazio')) continue;
 
             const { ctime } = await stat(filePath);
             const modificado = new Date(ctime).getTime();

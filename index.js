@@ -54,6 +54,35 @@ app.get('/video', delOldFiles, validateUrlRouter, async function (req, res) {
 
     res.json({ success: true, file: `${apiUrl}/arquivo/?arquivo=${arquivo}` });
 });
+app.get('/raw-video', delOldFiles, validateUrlRouter, async function (req, res) {
+    let { url, itag } = req.query
+
+    console.log('video ', url)
+
+    let video = ytapi({ url: url, itag: itag })
+    let arquivo = await video.rawMp4()
+
+    if (!arquivo) return res.json({ success: false, error: `erro ao baixar arquivo` });
+
+    let apiUrl = await myhost(req)
+
+    res.json({ success: true, file: `${apiUrl}/arquivo/?arquivo=${arquivo}` });
+});
+app.get('/raw-audio', delOldFiles, validateUrlRouter, async function (req, res) {
+    let { url, itag } = req.query
+
+    console.log('video ', url)
+
+    let video = ytapi({ url: url, itag: itag })
+    let arquivo = await video.rawAudio()
+
+    if (!arquivo) return res.json({ success: false, error: `erro ao baixar arquivo` });
+
+    let apiUrl = await myhost(req)
+
+    res.json({ success: true, file: `${apiUrl}/arquivo/?arquivo=${arquivo}` });
+});
+
 app.get('/arquivo', delOldFiles, function (req, res) {
     let { arquivo } = req.query
 
