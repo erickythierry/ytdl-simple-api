@@ -1,6 +1,6 @@
 {
   "name": "api-ytdl",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "api para download de musicas e videos do youtube",
   "main": "index.js",
   "type": "module",
