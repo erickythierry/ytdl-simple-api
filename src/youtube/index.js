@@ -70,7 +70,7 @@ export function getItag(lista, type = 'video') {
         lista = lista
             .filter(i => { // filtra apenas os formatos mp4 que sejam 720p ou 480p
                 if (i.container == 'mp4') {
-                    if (i.qualityLabel == '360p' || i.qualityLabel == '480p' || i.qualityLabel == '720p' || i.qualityLabel == '1080p') return true
+                    if (i.qualityLabel == '360p' || i.qualityLabel == '480p' || i.qualityLabel == '720p') return true
                 }
             })
             .map(i => { return { q: i.qualityLabel, itag: i.itag, audio: i.hasAudio, size: i.contentLength } }) // reduz para apenas as propriedades qualityLabel e itag
