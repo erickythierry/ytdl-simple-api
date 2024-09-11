@@ -70,20 +70,29 @@ export function getItag(lista, type = 'video') {
         lista = lista
             .filter(i => { // filtra apenas os formatos mp4 que sejam 720p ou 480p
                 if (i.container == 'mp4') {
-                    if (i.qualityLabel == '360p' || i.qualityLabel == '480p' || i.qualityLabel == '720p' || i.qualityLabel == '1080p') return true //
+                    if (i.qualityLabel == '360p' || i.qualityLabel == '480p' || i.qualityLabel == '720p' || i.qualityLabel == '1080p') return true
                 }
             })
             .map(i => { return { q: i.qualityLabel, itag: i.itag, audio: i.hasAudio, size: i.contentLength } }) // reduz para apenas as propriedades qualityLabel e itag
         lista = filterDuplicates(lista, 'q')
 
         return lista
-            .sort((a, b) => { // organiza em sequencia as qualidades para que 720p fique sempre em primeiro
-                if (parseInt(a.q) > parseInt(b.q)) return -1
-                return 1
-            }).sort((a, b) => {
-                if (a.audio == true) return -1;
-                return 1
-            })
+            .sort((a, b) => {
+                // Primeiro, organiza por qualidade, da maior para a menor
+                let qualityA = parseInt(a.q);
+                let qualityB = parseInt(b.q);
+
+                if (qualityA !== qualityB) {
+                    return qualityB - qualityA; // Maior qualidade primeiro
+                }
+
+                // Se as qualidades forem iguais, prioriza os que têm áudio
+                if (a.audio !== b.audio) {
+                    return a.audio ? -1 : 1; // Prioriza áudio
+                }
+
+                return 0; // Mantém a ordem se forem equivalentes
+            });
     }
 
     let result = lista

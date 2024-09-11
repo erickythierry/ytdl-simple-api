@@ -40,24 +40,29 @@ export async function mp4(data) {
 
 export async function rawMp4(data) {
     if (!data?.url) return;
-    try {
-        let videoinfo = await ytdl.getInfo(data?.url, { agent })
-        console.log(getItag(videoinfo.formats))
-        let selected = getItag(videoinfo.formats)[0]
-        let itag = data?.itag || selected.itag
-        let videoID = videoinfo?.videoDetails?.videoId
-        let nomearquivo = 'video_' + (videoID || getRandom('')) + '.mp4'
-        let arquivo = fs.createWriteStream(('./publico/' + nomearquivo))
 
-        ytdl.downloadFromInfo(videoinfo, { quality: itag, format: 'mp4', agent })
-            .pipe(arquivo)
+    return await new Promise(async (res, rej) => {
+        try {
+            let videoinfo = await ytdl.getInfo(data?.url, { agent })
+            console.log(getItag(videoinfo.formats))
+            let selected = getItag(videoinfo.formats)[0]
+            let itag = data?.itag || selected.itag
+            let videoID = videoinfo?.videoDetails?.videoId
+            let nomearquivo = 'video_' + (videoID || getRandom('')) + '.mp4'
+            let arquivo = fs.createWriteStream(('./publico/' + nomearquivo))
 
-        await new Promise((resolve) => arquivo.on('finish', resolve()))
-        return nomearquivo
+            ytdl.downloadFromInfo(videoinfo, { quality: itag, format: 'mp4', agent })
+                .pipe(arquivo)
 
-    } catch (e) {
-        console.log('erro ', e)
-    }
+            arquivo.on('finish', () => res(nomearquivo));
+            arquivo.on('error', () => res(undefined));
+
+        } catch (e) {
+            console.log('erro ', e)
+            res(undefined)
+        }
+    })
+
 }
 
 async function convert(video, audio) {
