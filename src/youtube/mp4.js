@@ -2,7 +2,7 @@ import ytdl from '@distube/ytdl-core';
 import { path as ffmpegPath } from '@ffmpeg-installer/ffmpeg';
 import ffmpeg from 'fluent-ffmpeg';
 import fs from 'fs'
-import { agent, getItag } from './index.js';
+import { getItag } from './index.js';
 import { mp3 } from "./mp3.js"
 import { getRandom } from "../core.js"
 
@@ -12,7 +12,7 @@ ffmpeg.setFfmpegPath(ffmpegPath)
 export async function mp4(data) {
     if (!data?.url) return;
     try {
-        let videoinfo = await ytdl.getInfo(data?.url, { agent })
+        let videoinfo = await ytdl.getInfo(data?.url)
         console.log(getItag(videoinfo.formats))
         let selected = getItag(videoinfo.formats)[0]
         let itag = data?.itag || selected.itag
@@ -20,7 +20,7 @@ export async function mp4(data) {
         let nomearquivo = 'video_' + (videoID || getRandom('')) + '.mp4'
         let arquivo = fs.createWriteStream(('./publico/' + nomearquivo))
 
-        ytdl.downloadFromInfo(videoinfo, { quality: itag, format: 'mp4', agent })
+        ytdl.downloadFromInfo(videoinfo, { quality: itag, format: 'mp4' })
             .pipe(arquivo)
 
         let resultado = await Promise.allSettled([
@@ -43,7 +43,7 @@ export async function rawMp4(data) {
 
     return await new Promise(async (res, rej) => {
         try {
-            let videoinfo = await ytdl.getInfo(data?.url, { agent })
+            let videoinfo = await ytdl.getInfo(data?.url)
             console.log(getItag(videoinfo.formats))
             let selected = getItag(videoinfo.formats)[0]
             let itag = data?.itag || selected.itag
@@ -51,7 +51,7 @@ export async function rawMp4(data) {
             let nomearquivo = 'video_' + (videoID || getRandom('')) + '.mp4'
             let arquivo = fs.createWriteStream(('./publico/' + nomearquivo))
 
-            ytdl.downloadFromInfo(videoinfo, { quality: itag, format: 'mp4', agent })
+            ytdl.downloadFromInfo(videoinfo, { quality: itag, format: 'mp4' })
                 .pipe(arquivo)
 
             arquivo.on('finish', () => res(nomearquivo));

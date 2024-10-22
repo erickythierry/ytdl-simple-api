@@ -8,23 +8,15 @@
 
 &nbsp;
 ## Deploy Local
- - Clone esse projeto, acesse a pasta raiz e execute o comando `npm install` ou `yarn` 
- - Crie o arquivo `env.js` na raiz do projeto (veja o arquivo `example.env.js` para entender como criar seu arquivo com seu cookie do youtube)
+ - Faça o clone desse projeto, acesse a pasta raiz e execute o comando `npm install` ou `yarn` 
  - Após isso, execute `npm start`
  - O endpoint do projeto vai estar em `http://localhost:3000`
 
 &nbsp;
-## Deploy com CapRover
-- o projeto já está adaptado para fazer buid no capRover
+## Deploy com CapRover (Docker)
+- o projeto já está adaptado para fazer buid no capRover (Docker)
 - CapRover é um sistema de deploy continuo que imita o Heroku (porém você precisa ter seu proprio servidor para usar...)
 - saiba mais sobre o CapRover <a href="https://caprover.com/">Aqui</a>
-
-&nbsp;
-## Use seu próprio cookie
-- Baixe essa extenção em seu navegador: <a href="https://www.editthiscookie.com/">EditThisCookie</a>
-- Abra o Youtube e faça login (de preferência uma conta nova para não usar a sua pessoal)
-- Clique na extenção e depois clique em "export"
-- Seu cookie será copiado para a área de transferêcia, salve na raiz do projeto como `cookie.json`
 
 &nbsp;
 ## modo de usar:

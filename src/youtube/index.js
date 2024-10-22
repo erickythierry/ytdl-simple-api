@@ -1,16 +1,8 @@
 import ytdl from '@distube/ytdl-core';
 import "dotenv/config"
-import fs from 'fs'
 import { buscar as b } from "./buscar.js";
 import { mp3, rawAudio } from "./mp3.js";
 import { mp4, rawMp4 } from "./mp4.js";
-
-export let agent = undefined
-
-if (fs.existsSync("./cookie.json")) {
-    console.log("usando cookie")
-    agent = ytdl.createAgent(JSON.parse(fs.readFileSync("./cookie.json")));
-}
 
 export default function ytapi(data) {
 
@@ -33,7 +25,7 @@ export default function ytapi(data) {
         getInfo: async () => {
             if (!data?.url) return;
             try {
-                let videoinfo = await ytdl.getInfo(data?.url, { agent })
+                let videoinfo = await ytdl.getInfo(data?.url)
                 let video_itag = getItag(videoinfo.formats)
                 let audio_itag = getItag(videoinfo.formats, 'audio')
                 return {
