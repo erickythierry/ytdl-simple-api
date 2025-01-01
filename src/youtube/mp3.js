@@ -1,62 +1,65 @@
-import ytdl from '@distube/ytdl-core';
-import { path as ffmpegPath } from '@ffmpeg-installer/ffmpeg';
-import ffmpeg from 'fluent-ffmpeg';
-import fs from 'fs'
-import { getRandom } from "../core.js"
+import ytdl from "@distube/ytdl-core";
+import { path as ffmpegPath } from "@ffmpeg-installer/ffmpeg";
+import ffmpeg from "fluent-ffmpeg";
+import fs from "fs";
+import { getRandom } from "../core.js";
 
-ffmpeg.setFfmpegPath(ffmpegPath)
-
+ffmpeg.setFfmpegPath(ffmpegPath);
 
 export async function mp3(data) {
     if (!data?.url) return;
-    let itag = data?.itag || 'highestaudio'
+    let itag = data?.itag || "highestaudio";
     try {
-        let videoinfo = await ytdl.getInfo(data?.url)
-        let videoID = videoinfo?.videoDetails?.videoId
-        let nomearquivo = 'audio_' + (videoID || getRandom('')) + '.mp3'
-        let audio = ytdl.downloadFromInfo(videoinfo, { quality: itag })
+        let videoinfo = await ytdl.getInfo(data?.url, {
+            playerClients: ["IOS", "WEB_CREATOR"],
+        });
+        let videoID = videoinfo?.videoDetails?.videoId;
+        let nomearquivo = "audio_" + (videoID || getRandom("")) + ".mp3";
+        let audio = ytdl.downloadFromInfo(videoinfo, { quality: itag });
 
         let result = await new Promise((res, rej) => {
             ffmpeg(audio)
-                .audioCodec('libmp3lame')
+                .audioCodec("libmp3lame")
                 .save(`./publico/${nomearquivo}`)
-                .on('end', () => {
-                    res(`${nomearquivo}`)
+                .on("end", () => {
+                    res(`${nomearquivo}`);
                 })
-                .on('error', function (err) {
-                    console.log('ffmpeg mp3 erro:', err)
-                    res()
+                .on("error", function (err) {
+                    console.log("ffmpeg mp3 erro:", err);
+                    res();
                 });
-        })
-        return result
-
+        });
+        return result;
     } catch (e) {
-        console.log('erro ', e)
+        console.log("erro ", e);
     }
 }
 
 export async function rawAudio(data) {
     if (!data?.url) return;
-    let itag = data?.itag || 'highestaudio'
+    let itag = data?.itag || "highestaudio";
 
     return await new Promise(async (resolve, rej) => {
         try {
-            let videoinfo = await ytdl.getInfo(data?.url)
-            let videoID = videoinfo?.videoDetails?.videoId
+            let videoinfo = await ytdl.getInfo(data?.url, {
+                playerClients: ["IOS", "WEB_CREATOR"],
+            });
+            let videoID = videoinfo?.videoDetails?.videoId;
             // Identifica o formato de contêiner do áudio
-            let audioFormat = videoinfo.formats.find(f => f.itag === itag || f.audioQuality)?.container || 'mp3';
-            let nomearquivo = 'audio_' + (videoID || getRandom('')) + '.' + audioFormat;
-            let arquivo = fs.createWriteStream('./publico/' + nomearquivo);
+            let audioFormat =
+                videoinfo.formats.find((f) => f.itag === itag || f.audioQuality)
+                    ?.container || "mp3";
+            let nomearquivo =
+                "audio_" + (videoID || getRandom("")) + "." + audioFormat;
+            let arquivo = fs.createWriteStream("./publico/" + nomearquivo);
 
             // Faz o download do áudio
-            ytdl.downloadFromInfo(videoinfo, { quality: itag }).pipe(arquivo)
-            arquivo.on('finish', () => resolve(nomearquivo))
-            arquivo.on('error', () => res(undefined));
-
+            ytdl.downloadFromInfo(videoinfo, { quality: itag }).pipe(arquivo);
+            arquivo.on("finish", () => resolve(nomearquivo));
+            arquivo.on("error", () => res(undefined));
         } catch (e) {
-            console.log('erro ', e)
-            resolve(undefined)
+            console.log("erro ", e);
+            resolve(undefined);
         }
-    })
-
+    });
 }

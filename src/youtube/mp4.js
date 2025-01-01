@@ -1,40 +1,41 @@
-import ytdl from '@distube/ytdl-core';
-import { path as ffmpegPath } from '@ffmpeg-installer/ffmpeg';
-import ffmpeg from 'fluent-ffmpeg';
-import fs from 'fs'
-import { getItag } from './index.js';
-import { mp3 } from "./mp3.js"
-import { getRandom } from "../core.js"
+import ytdl from "@distube/ytdl-core";
+import { path as ffmpegPath } from "@ffmpeg-installer/ffmpeg";
+import ffmpeg from "fluent-ffmpeg";
+import fs from "fs";
+import { getItag } from "./index.js";
+import { mp3 } from "./mp3.js";
+import { getRandom } from "../core.js";
 
-ffmpeg.setFfmpegPath(ffmpegPath)
-
+ffmpeg.setFfmpegPath(ffmpegPath);
 
 export async function mp4(data) {
     if (!data?.url) return;
     try {
-        let videoinfo = await ytdl.getInfo(data?.url)
-        console.log(getItag(videoinfo.formats))
-        let selected = getItag(videoinfo.formats)[0]
-        let itag = data?.itag || selected.itag
-        let videoID = videoinfo?.videoDetails?.videoId
-        let nomearquivo = 'video_' + (videoID || getRandom('')) + '.mp4'
-        let arquivo = fs.createWriteStream(('./publico/' + nomearquivo))
+        let videoinfo = await ytdl.getInfo(data?.url, {
+            playerClients: ["IOS", "WEB_CREATOR"],
+        });
+        console.log(getItag(videoinfo.formats));
+        let selected = getItag(videoinfo.formats)[0];
+        let itag = data?.itag || selected.itag;
+        let videoID = videoinfo?.videoDetails?.videoId;
+        let nomearquivo = "video_" + (videoID || getRandom("")) + ".mp4";
+        let arquivo = fs.createWriteStream("./publico/" + nomearquivo);
 
-        ytdl.downloadFromInfo(videoinfo, { quality: itag, format: 'mp4' })
-            .pipe(arquivo)
+        ytdl.downloadFromInfo(videoinfo, { quality: itag, format: "mp4" }).pipe(
+            arquivo
+        );
 
         let resultado = await Promise.allSettled([
-            new Promise((resolve) => arquivo.on('finish', resolve())),
-            mp3({ url: data.url })
-        ])
+            new Promise((resolve) => arquivo.on("finish", resolve())),
+            mp3({ url: data.url }),
+        ]);
 
-        let audio = resultado[1].value
-        let fim = await convert(nomearquivo, audio)
+        let audio = resultado[1].value;
+        let fim = await convert(nomearquivo, audio);
         if (!fim) return;
-        return fim
-
+        return fim;
     } catch (e) {
-        console.log('erro ', e)
+        console.log("erro ", e);
     }
 }
 
@@ -43,43 +44,44 @@ export async function rawMp4(data) {
 
     return await new Promise(async (res, rej) => {
         try {
-            let videoinfo = await ytdl.getInfo(data?.url)
-            console.log(getItag(videoinfo.formats))
-            let selected = getItag(videoinfo.formats)[0]
-            let itag = data?.itag || selected.itag
-            let videoID = videoinfo?.videoDetails?.videoId
-            let nomearquivo = 'video_' + (videoID || getRandom('')) + '.mp4'
-            let arquivo = fs.createWriteStream(('./publico/' + nomearquivo))
+            let videoinfo = await ytdl.getInfo(data?.url, {
+                playerClients: ["IOS", "WEB_CREATOR"],
+            });
+            console.log(getItag(videoinfo.formats));
+            let selected = getItag(videoinfo.formats)[0];
+            let itag = data?.itag || selected.itag;
+            let videoID = videoinfo?.videoDetails?.videoId;
+            let nomearquivo = "video_" + (videoID || getRandom("")) + ".mp4";
+            let arquivo = fs.createWriteStream("./publico/" + nomearquivo);
 
-            ytdl.downloadFromInfo(videoinfo, { quality: itag, format: 'mp4' })
-                .pipe(arquivo)
+            ytdl.downloadFromInfo(videoinfo, {
+                quality: itag,
+                format: "mp4",
+            }).pipe(arquivo);
 
-            arquivo.on('finish', () => res(nomearquivo));
-            arquivo.on('error', () => res(undefined));
-
+            arquivo.on("finish", () => res(nomearquivo));
+            arquivo.on("error", () => res(undefined));
         } catch (e) {
-            console.log('erro ', e)
-            res(undefined)
+            console.log("erro ", e);
+            res(undefined);
         }
-    })
-
+    });
 }
 
 async function convert(video, audio) {
     return await new Promise((res) => {
         ffmpeg()
-            .addInput(('./publico/' + video))
-            .addInput(('./publico/' + audio))
-            .addOptions(['-map 0:v', '-map 1:a', '-c:v copy'])
-            .format('mp4')
-            .on('error', error => {
-                console.log(error)
-                res()
+            .addInput("./publico/" + video)
+            .addInput("./publico/" + audio)
+            .addOptions(["-map 0:v", "-map 1:a", "-c:v copy"])
+            .format("mp4")
+            .on("error", (error) => {
+                console.log(error);
+                res();
             })
-            .on('end', () => {
-                res(("merged_" + video))
+            .on("end", () => {
+                res("merged_" + video);
             })
-            .saveToFile(("./publico/merged_" + video))
-    })
+            .saveToFile("./publico/merged_" + video);
+    });
 }
-
