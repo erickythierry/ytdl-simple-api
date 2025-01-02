@@ -15,7 +15,10 @@ export async function mp3(data) {
         });
         let videoID = videoinfo?.videoDetails?.videoId;
         let nomearquivo = "audio_" + (videoID || getRandom("")) + ".mp3";
-        let audio = ytdl.downloadFromInfo(videoinfo, { quality: itag });
+        let audio = ytdl.downloadFromInfo(videoinfo, {
+            quality: itag,
+            playerClients: ["IOS", "WEB_CREATOR"],
+        });
 
         let result = await new Promise((res, rej) => {
             ffmpeg(audio)
@@ -54,7 +57,10 @@ export async function rawAudio(data) {
             let arquivo = fs.createWriteStream("./publico/" + nomearquivo);
 
             // Faz o download do áudio
-            ytdl.downloadFromInfo(videoinfo, { quality: itag }).pipe(arquivo);
+            ytdl.downloadFromInfo(videoinfo, {
+                quality: itag,
+                playerClients: ["IOS", "WEB_CREATOR"],
+            }).pipe(arquivo);
             arquivo.on("finish", () => resolve(nomearquivo));
             arquivo.on("error", () => res(undefined));
         } catch (e) {

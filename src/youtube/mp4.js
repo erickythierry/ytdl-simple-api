@@ -21,9 +21,11 @@ export async function mp4(data) {
         let nomearquivo = "video_" + (videoID || getRandom("")) + ".mp4";
         let arquivo = fs.createWriteStream("./publico/" + nomearquivo);
 
-        ytdl.downloadFromInfo(videoinfo, { quality: itag, format: "mp4" }).pipe(
-            arquivo
-        );
+        ytdl.downloadFromInfo(videoinfo, {
+            quality: itag,
+            format: "mp4",
+            playerClients: ["IOS", "WEB_CREATOR"],
+        }).pipe(arquivo);
 
         let resultado = await Promise.allSettled([
             new Promise((resolve) => arquivo.on("finish", resolve())),
@@ -57,6 +59,7 @@ export async function rawMp4(data) {
             ytdl.downloadFromInfo(videoinfo, {
                 quality: itag,
                 format: "mp4",
+                playerClients: ["IOS", "WEB_CREATOR"],
             }).pipe(arquivo);
 
             arquivo.on("finish", () => res(nomearquivo));
